@@ -18,32 +18,17 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/kabilshrestha/Downloads/Java Jar Files/jar_files/jakarta.servlet-api-5.0.0.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/Users/kabilshrestha/Downloads/Java Jar Files/jar_files/jakarta.servlet.jsp.jstl-2.0.0.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="/Users/kabilshrestha/Downloads/Java Jar Files/jar_files/jakarta.xml.bind-api-3.0.0.jar">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/kabilshrestha/Downloads/Java Jar Files/jar_files/jakarta.activation-2.0.0.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/Users/kabilshrestha/Downloads/Java Jar Files/jar_files/jakarta.servlet.jsp.jstl-api-2.0.0.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="/Users/kabilshrestha/Downloads/Java Jar Files/jar_files/jakarta.el-api-4.0.0.jar">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/kabilshrestha/Downloads/jakarta.servlet.jsp.jstl-3.0.1.jar">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
