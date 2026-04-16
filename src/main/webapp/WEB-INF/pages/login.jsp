@@ -6,16 +6,28 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Login | Class Sync</title>
-    
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    
-    <!-- CSS Path Fix using Context Path -->
     <link rel="stylesheet" type="text/css" href="<%= path %>/css/style.css">
 </head>
 <body>
-<main class="main-container">
+
+<header class="navbar">
+    <div class="nav-container">
+        <a href="<%= path %>/" class="logo-wrapper" style="text-decoration: none; color: inherit;">
+            <div class="logo-icon">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+            </div>
+            <span class="logo-text">Class Sync</span>
+        </a>
+        <div class="nav-actions">
+            <button class="btn-text" onclick="location.href='<%= path %>/login'">Login</button>
+            <button class="btn-primary" onclick="location.href='<%= path %>/register'">Register</button>
+        </div>
+    </div>
+</header>
+
+<main>
     <!-- Background Artistic Elements -->
     <div class="bg-art-layer">
         <div class="blob-1"></div>
@@ -25,9 +37,6 @@
     <div class="login-wrapper">
         <!-- Brand Header -->
         <div class="brand-header">
-            <div class="brand-logo-box">
-                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 32px;">school</span>
-            </div>
             <h1 class="brand-name">Class Sync</h1>
             <p class="brand-motto">Institutional Timetable Management</p>
         </div>
@@ -39,7 +48,7 @@
                 <p>Please enter your institutional credentials.</p>
             </div>
 
-            <%-- Success Message for Registration --%>
+            <%-- Success Message --%>
             <% if(request.getParameter("registered") != null) { %>
             <div class="alert-box alert-success">
                 <span class="material-symbols-outlined" style="font-size: 20px;">check_circle</span>
@@ -50,7 +59,7 @@
             </div>
             <% } %>
 
-            <%-- Error Message Handling --%>
+            <%-- Error Message --%>
             <% if(request.getAttribute("error") != null) { %>
             <div class="alert-box alert-error">
                 <span class="material-symbols-outlined" style="font-size: 20px;">error</span>
@@ -62,7 +71,6 @@
             <% } %>
 
             <form action="login" method="POST" class="form-stack">
-                <!-- Field: Email -->
                 <div>
                     <label class="field-label" for="email">Username or Email</label>
                     <div class="input-rel">
@@ -73,7 +81,6 @@
                     </div>
                 </div>
 
-                <!-- Field: Password -->
                 <div>
                     <div class="pass-header">
                         <label class="field-label" for="password">Password</label>
@@ -86,22 +93,18 @@
                     </div>
                 </div>
 
-                <!-- Remember Me -->
                 <div class="checkbox-group">
                     <input type="checkbox" id="remember" name="remember" ${rememberedEmail != null ? 'checked' : ''}>
                     <label for="remember">Remember Me</label>
                 </div>
 
-                <!-- Action Button -->
                 <div class="submit-area">
                     <button class="btn-gradient" type="submit">
                         Login
-                        <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
                     </button>
                 </div>
             </form>
 
-            <!-- Card Footer -->
             <div class="alt-action">
                 <p>
                     Don't have an account? <a class="register-link" href="register">Register here</a>
@@ -111,8 +114,11 @@
     </div>
 </main>
 
-<footer class="page-footer">
-    <p class="copyright-text">© 2026 Class Sync. All rights reserved.</p>
+<footer class="footer">
+    <div class="footer-divider" style="justify-content: center; border: none; padding: 2rem 0;">
+        <p class="copyright-small">© 2026 Class Sync. All rights reserved.</p>
+    </div>
 </footer>
+
 </body>
 </html>
