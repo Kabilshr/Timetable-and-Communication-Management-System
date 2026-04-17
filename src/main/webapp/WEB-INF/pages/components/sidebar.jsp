@@ -33,17 +33,4 @@
         </a>
 
     </nav>
-
-    <div class="sidebar-status">
-        <div class="status-header">
-            <span>Server Status</span>
-            <span class="status-dot"></span>
-        </div>
-
-        <div class="status-bar">
-            <div class="status-fill"></div>
-        </div>
-
-        <p class="status-text">Operational: 99.9% uptime</p>
-    </div>
 </aside>
