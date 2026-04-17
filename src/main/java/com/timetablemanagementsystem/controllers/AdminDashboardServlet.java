@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.sql.Time;
 import java.util.List;
 
+/**
+ * Controller for the Admin Dashboard and its various management views.
+ */
 @WebServlet("/admin-dashboard")
 public class AdminDashboardServlet extends HttpServlet {
     private SubjectDAO subjectDAO = new SubjectDAO();
@@ -30,21 +33,43 @@ public class AdminDashboardServlet extends HttpServlet {
                 return;
             }
 
-            // Fetch all data for the dashboard
-            List<Subject> subjects = subjectDAO.getAllSubjects();
-            List<Teacher> teachers = teacherDAO.getAllTeachers();
-            List<TimetableEntry> timetable = timetableDAO.getTimetable(null, null);
-            List<User> teacherUsers = userDAO.getUsersByRole("Teacher");
-            List<Announcement> announcements = announcementDAO.getAllAnnouncements();
-            
-            request.setAttribute("subjects", subjects);
-            request.setAttribute("teachers", teachers);
-            request.setAttribute("timetable", timetable);
-            request.setAttribute("teacherUsers", teacherUsers);
-            request.setAttribute("announcements", announcements);
-            request.setAttribute("user", user);
+            String view = request.getParameter("view");
+            if (view == null) view = "dashboard";
 
-            request.getRequestDispatcher("/WEB-INF/pages/admin-dashboard.jsp").forward(request, response);
+            if ("dashboard".equals(view)) {
+                request.setAttribute("totalUsers", userDAO.getUserCount());
+                request.setAttribute("totalStudents", userDAO.getCountByRole("Student"));
+                request.setAttribute("totalTeachers", userDAO.getCountByRole("Teacher"));
+                request.setAttribute("totalClasses", timetableDAO.getClassCount());
+                request.setAttribute("users", userDAO.getAllUsers());
+                request.getRequestDispatcher("/WEB-INF/pages/admin-dashboard.jsp").forward(request, response);
+            } else if ("schedule".equals(view)) {
+                List<Subject> subjects = subjectDAO.getAllSubjects();
+                List<TimetableEntry> timetable = timetableDAO.getTimetable(null, null);
+                List<User> teacherUsers = userDAO.getUsersByRole("Teacher");
+                
+                request.setAttribute("subjects", subjects);
+                request.setAttribute("timetable", timetable);
+                request.setAttribute("teacherUsers", teacherUsers);
+                request.getRequestDispatcher("/WEB-INF/pages/manage-schedule.jsp").forward(request, response);
+            } else if ("teachers".equals(view)) {
+                List<Subject> subjects = subjectDAO.getAllSubjects();
+                List<User> teacherUsers = userDAO.getUsersByRole("Teacher");
+                List<Teacher> teachers = teacherDAO.getAllTeachers();
+                
+                request.setAttribute("subjects", subjects);
+                request.setAttribute("teacherUsers", teacherUsers);
+                request.setAttribute("teachers", teachers);
+                request.getRequestDispatcher("/WEB-INF/pages/manage-teachers.jsp").forward(request, response);
+            } else if ("announcements".equals(view)) {
+                List<Announcement> announcements = announcementDAO.getAllAnnouncements();
+                request.setAttribute("announcements", announcements);
+                request.getRequestDispatcher("/WEB-INF/pages/manage-announcements.jsp").forward(request, response);
+            } else if ("subjects".equals(view)) {
+                List<Subject> subjects = subjectDAO.getAllSubjects();
+                request.setAttribute("subjects", subjects);
+                request.getRequestDispatcher("/WEB-INF/pages/manage-subjects.jsp").forward(request, response);
+            }
         } catch (Exception e) {
             System.err.println("Admin Dashboard Error: " + e.getMessage());
             e.printStackTrace();
@@ -54,6 +79,8 @@ public class AdminDashboardServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
+        String redirectView = "dashboard";
+        
         if (action == null) {
             response.sendRedirect("admin-dashboard");
             return;
@@ -64,18 +91,22 @@ public class AdminDashboardServlet extends HttpServlet {
                 String code = request.getParameter("code");
                 String name = request.getParameter("name");
                 subjectDAO.addSubject(new Subject(code, name));
+                redirectView = "subjects";
                 break;
             case "deleteSubject":
                 subjectDAO.deleteSubject(request.getParameter("code"));
+                redirectView = "subjects";
                 break;
             case "addTeacher":
                 Teacher teacher = new Teacher();
                 teacher.setUserId(Integer.parseInt(request.getParameter("userId")));
                 teacher.setSubjectId(request.getParameter("subjectId"));
                 teacherDAO.addTeacher(teacher);
+                redirectView = "teachers";
                 break;
             case "deleteTeacher":
                 teacherDAO.deleteTeacher(Integer.parseInt(request.getParameter("id")));
+                redirectView = "teachers";
                 break;
             case "addTimetable":
                 TimetableEntry entry = new TimetableEntry();
@@ -85,17 +116,21 @@ public class AdminDashboardServlet extends HttpServlet {
                 entry.setClassDay(request.getParameter("day"));
                 entry.setRoomNumber(request.getParameter("room"));
                 timetableDAO.addEntry(entry);
+                redirectView = "schedule";
                 break;
             case "deleteTimetable":
                 timetableDAO.deleteEntry(Integer.parseInt(request.getParameter("id")));
+                redirectView = "schedule";
                 break;
             case "addAnnouncement":
                 announcementDAO.addAnnouncement(request.getParameter("title"), request.getParameter("content"));
+                redirectView = "announcements";
                 break;
             case "deleteAnnouncement":
                 announcementDAO.deleteAnnouncement(Integer.parseInt(request.getParameter("id")));
+                redirectView = "announcements";
                 break;
         }
-        response.sendRedirect("admin-dashboard");
+        response.sendRedirect("admin-dashboard?view=" + redirectView);
     }
 }

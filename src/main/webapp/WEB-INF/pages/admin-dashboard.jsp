@@ -65,219 +65,90 @@
 
         <div class="admin-content">
             
-            <!-- Subject Management -->
-            <div class="admin-section" id="subjects">
-                <div class="section-header" style="margin-bottom: 1.5rem;">
-                    <h2>Manage Subjects</h2>
-                </div>
-                
-                <form action="admin-dashboard" method="POST" class="add-form">
-                    <input type="hidden" name="action" value="addSubject">
-                    <div class="form-group" style="margin-bottom:0">
-                        <label class="form-label">Code</label>
-                        <input type="text" name="code" class="form-input" style="width: 100px" placeholder="CS101" required>
-                    </div>
-                    <div class="form-group" style="margin-bottom:0">
-                        <label class="form-label">Name</label>
-                        <input type="text" name="name" class="form-input" placeholder="Introduction to Java" required>
-                    </div>
-                    <button type="submit" class="btn-primary" style="width: auto; padding: 0.75rem 1.5rem">Add</button>
-                </form>
+            <div class="section-header" style="margin-bottom: 2rem;">
+                <h1>Admin Dashboard Overview</h1>
+                <p class="text-secondary">System statistics at a glance</p>
+            </div>
 
+            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="stat-card" style="background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 1.5rem;">
+                    <div class="stat-icon" style="background: var(--primary-container); color: white; width: 60px; height: 60px; border-radius: 1rem; display: flex; align-items: center; justify-content: center;">
+                        <span class="material-symbols-outlined" style="font-size: 32px">group</span>
+                    </div>
+                    <div>
+                        <p style="font-weight: 600; color: var(--light-text); margin-bottom: 0.25rem;">Total Users</p>
+                        <h2 style="font-size: 2rem; font-weight: 800; margin: 0;">${totalUsers}</h2>
+                    </div>
+                </div>
+
+                <div class="stat-card" style="background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 1.5rem;">
+                    <div class="stat-icon" style="background: #e3f2fd; color: #1976d2; width: 60px; height: 60px; border-radius: 1rem; display: flex; align-items: center; justify-content: center;">
+                        <span class="material-symbols-outlined" style="font-size: 32px">school</span>
+                    </div>
+                    <div>
+                        <p style="font-weight: 600; color: var(--light-text); margin-bottom: 0.25rem;">Students</p>
+                        <h2 style="font-size: 2rem; font-weight: 800; margin: 0;">${totalStudents}</h2>
+                    </div>
+                </div>
+
+                <div class="stat-card" style="background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 1.5rem;">
+                    <div class="stat-icon" style="background: #f1f8e9; color: #388e3c; width: 60px; height: 60px; border-radius: 1rem; display: flex; align-items: center; justify-content: center;">
+                        <span class="material-symbols-outlined" style="font-size: 32px">person</span>
+                    </div>
+                    <div>
+                        <p style="font-weight: 600; color: var(--light-text); margin-bottom: 0.25rem;">Teachers</p>
+                        <h2 style="font-size: 2rem; font-weight: 800; margin: 0;">${totalTeachers}</h2>
+                    </div>
+                </div>
+
+                <div class="stat-card" style="background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 1.5rem;">
+                    <div class="stat-icon" style="background: #fff3e0; color: #f57c00; width: 60px; height: 60px; border-radius: 1rem; display: flex; align-items: center; justify-content: center;">
+                        <span class="material-symbols-outlined" style="font-size: 32px">event_note</span>
+                    </div>
+                    <div>
+                        <p style="font-weight: 600; color: var(--light-text); margin-bottom: 0.25rem;">Classes</p>
+                        <h2 style="font-size: 2rem; font-weight: 800; margin: 0;">${totalClasses}</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-section">
+                <div class="section-header" style="margin-bottom: 1.5rem;">
+                    <h2>Quick Actions</h2>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <a href="admin-dashboard?view=schedule" class="btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <span class="material-symbols-outlined">add</span> Manage Schedule
+                    </a>
+                    <a href="admin-dashboard?view=announcements" class="btn-primary" style="text-decoration: none; background: var(--secondary); display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <span class="material-symbols-outlined">campaign</span> Post Announcement
+                    </a>
+                </div>
+            </div>
+
+            <!-- User List Table -->
+            <div class="admin-section">
+                <div class="section-header" style="margin-bottom: 1.5rem;">
+                    <h2>System Users</h2>
+                    <p class="text-secondary">Overview of all registered accounts and their roles</p>
+                </div>
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>Code</th>
                             <th>Name</th>
-                            <th>Action</th>
+                            <th>Email</th>
+                            <th>Role</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach items="${subjects}" var="s">
+                        <c:forEach items="${users}" var="u">
                             <tr>
-                                <td><strong>${s.subjectCode}</strong></td>
-                                <td>${s.subjectName}</td>
+                                <td><strong>${u.name}</strong></td>
+                                <td>${u.email}</td>
                                 <td>
-                                    <form action="admin-dashboard" method="POST" style="display:inline">
-                                        <input type="hidden" name="action" value="deleteSubject">
-                                        <input type="hidden" name="code" value="${s.subjectCode}">
-                                        <button type="submit" class="btn-delete">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        </c:forEach>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Teacher Management -->
-            <div class="admin-section" id="teachers">
-                <div class="section-header" style="margin-bottom: 1.5rem;">
-                    <h2>Manage Teachers</h2>
-                </div>
-
-                <form action="admin-dashboard" method="POST" class="add-form">
-                    <input type="hidden" name="action" value="addTeacher">
-                    <div class="form-group" style="margin-bottom:0">
-                        <label class="form-label">User</label>
-                        <select name="userId" class="form-select" required>
-                            <c:forEach items="${teacherUsers}" var="u">
-                                <option value="${u.userId}">${u.name}</option>
-                            </c:forEach>
-                        </select>
-                    </div>
-                    <div class="form-group" style="margin-bottom:0">
-                        <label class="form-label">Subject</label>
-                        <select name="subjectId" class="form-select" required>
-                            <c:forEach items="${subjects}" var="s">
-                                <option value="${s.subjectCode}">${s.subjectName}</option>
-                            </c:forEach>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn-primary" style="width: auto; padding: 0.75rem 1.5rem">Assign</button>
-                </form>
-
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Teacher Name</th>
-                            <th>Subject</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:forEach items="${teachers}" var="t">
-                            <tr>
-                                <td>${t.teacherName}</td>
-                                <td>${t.subjectId}</td>
-                                <td>
-                                    <form action="admin-dashboard" method="POST" style="display:inline">
-                                        <input type="hidden" name="action" value="deleteTeacher">
-                                        <input type="hidden" name="id" value="${t.teacherId}">
-                                        <button type="submit" class="btn-delete">Remove</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        </c:forEach>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Timetable Management -->
-            <div class="admin-section" id="timetable">
-                <div class="section-header" style="margin-bottom: 1.5rem;">
-                    <h2>Manage Timetable</h2>
-                </div>
-
-                <form action="admin-dashboard" method="POST" class="add-form">
-                    <input type="hidden" name="action" value="addTimetable">
-                    <div class="form-group" style="margin-bottom:0">
-                        <label class="form-label">Subject</label>
-                        <select name="subjectId" class="form-select" required>
-                            <c:forEach items="${subjects}" var="s">
-                                <option value="${s.subjectCode}">${s.subjectCode}</option>
-                            </c:forEach>
-                        </select>
-                    </div>
-                    <div class="form-group" style="margin-bottom:0">
-                        <label class="form-label">Teacher</label>
-                        <select name="teacherId" class="form-select" required>
-                            <c:forEach items="${teachers}" var="t">
-                                <option value="${t.teacherId}">${t.teacherName}</option>
-                            </c:forEach>
-                        </select>
-                    </div>
-                    <div class="form-group" style="margin-bottom:0">
-                        <label class="form-label">Day</label>
-                        <select name="day" class="form-select" required>
-                            <option value="Monday">Monday</option>
-                            <option value="Tuesday">Tuesday</option>
-                            <option value="Wednesday">Wednesday</option>
-                            <option value="Thursday">Thursday</option>
-                            <option value="Friday">Friday</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="margin-bottom:0">
-                        <label class="form-label">Time</label>
-                        <input type="time" name="time" class="form-input" required>
-                    </div>
-                    <div class="form-group" style="margin-bottom:0">
-                        <label class="form-label">Room</label>
-                        <input type="text" name="room" class="form-input" style="width: 80px" placeholder="101" required>
-                    </div>
-                    <button type="submit" class="btn-primary" style="width: auto; padding: 0.75rem 1.5rem">Add</button>
-                </form>
-
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Day</th>
-                            <th>Time</th>
-                            <th>Subject</th>
-                            <th>Teacher</th>
-                            <th>Room</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:forEach items="${timetable}" var="e">
-                            <tr>
-                                <td>${e.classDay}</td>
-                                <td>${e.classTime}</td>
-                                <td>${e.subjectName}</td>
-                                <td>${e.teacherName}</td>
-                                <td>${e.roomNumber}</td>
-                                <td>
-                                    <form action="admin-dashboard" method="POST" style="display:inline">
-                                        <input type="hidden" name="action" value="deleteTimetable">
-                                        <input type="hidden" name="id" value="${e.entryId}">
-                                        <button type="submit" class="btn-delete">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        </c:forEach>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Announcement Management -->
-            <div class="admin-section" id="announcements">
-                <div class="section-header" style="margin-bottom: 1.5rem;">
-                    <h2>Manage Announcements</h2>
-                </div>
-
-                <form action="admin-dashboard" method="POST" class="add-form" style="display:block">
-                    <input type="hidden" name="action" value="addAnnouncement">
-                    <div class="form-group">
-                        <label class="form-label">Title</label>
-                        <input type="text" name="title" class="form-input" placeholder="Holiday Notice" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Content</label>
-                        <textarea name="content" class="form-input" style="height: 80px; resize: vertical;" placeholder="Details..." required></textarea>
-                    </div>
-                    <button type="submit" class="btn-primary" style="width: auto; padding: 0.75rem 1.5rem">Post</button>
-                </form>
-
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Title</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:forEach items="${announcements}" var="a">
-                            <tr>
-                                <td>${a.createdAt}</td>
-                                <td><strong>${a.title}</strong></td>
-                                <td>
-                                    <form action="admin-dashboard" method="POST" style="display:inline">
-                                        <input type="hidden" name="action" value="deleteAnnouncement">
-                                        <input type="hidden" name="id" value="${a.id}">
-                                        <button type="submit" class="btn-delete">Delete</button>
-                                    </form>
+                                    <span class="badge" style="background: ${u.role == 'Admin' ? '#fff9c4' : (u.role == 'Teacher' ? '#e8f5e9' : '#e3f2fd')}; color: ${u.role == 'Admin' ? '#f57f17' : (u.role == 'Teacher' ? '#2e7d32' : '#1565c0')}; padding: 4px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;">
+                                        ${u.role}
+                                    </span>
                                 </td>
                             </tr>
                         </c:forEach>
