@@ -6,6 +6,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object for Timetable-related database operations.
+ */
 public class TimetableDAO {
     public boolean addEntry(TimetableEntry entry) {
         String query = "INSERT INTO timetable (subject_id, teacher_id, class_time, class_day, room_number) VALUES (?, ?, ?, ?, ?)";
@@ -28,8 +31,7 @@ public class TimetableDAO {
         StringBuilder query = new StringBuilder("SELECT tt.*, s.subject_name, u.name as teacher_name " +
                                              "FROM timetable tt " +
                                              "JOIN subjects s ON tt.subject_id = s.subject_code " +
-                                             "JOIN teachers t ON tt.teacher_id = t.teacher_id " +
-                                             "JOIN users u ON t.user_id = u.user_id WHERE 1=1 ");
+                                             "JOIN users u ON tt.teacher_id = u.user_id WHERE 1=1 ");
         
         if (subjectCode != null && !subjectCode.isEmpty()) query.append("AND tt.subject_id = ? ");
         if (day != null && !day.isEmpty()) query.append("AND tt.class_day = ? ");
@@ -69,5 +71,19 @@ public class TimetableDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public int getClassCount() {
+        String query = "SELECT COUNT(*) FROM timetable";
+        try (Connection conn = DBConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
