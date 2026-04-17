@@ -29,7 +29,7 @@
             
             <div class="admin-section">
                 <div class="section-header" style="margin-bottom: 1.5rem;">
-                    <h2>Assign Teacher to Subject</h2>
+                    <h2>Add New Teacher</h2>
                 </div>
 
                 <form action="admin-dashboard" method="POST" class="add-form">
@@ -37,15 +37,14 @@
                     <div style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
                         <div class="form-group" style="margin-bottom:0; flex: 1; min-width: 200px;">
                             <label class="form-label">Teacher Name</label>
-                            <select name="userId" class="form-select" required>
-                                <option value="" disabled selected>Select Teacher</option>
-                                <c:forEach items="${teacherUsers}" var="u">
-                                    <option value="${u.userId}">${u.name}</option>
-                                </c:forEach>
-                            </select>
+                            <input type="text" name="teacherName" class="form-input" placeholder="e.g. John Doe" required>
                         </div>
                         <div class="form-group" style="margin-bottom:0; flex: 1; min-width: 200px;">
-                            <label class="form-label">Assign Subject</label>
+                            <label class="form-label">Teacher Email</label>
+                            <input type="email" name="teacherEmail" class="form-input" placeholder="e.g. john@example.com" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0; flex: 1; min-width: 200px;">
+                            <label class="form-label">Primary Subject</label>
                             <select name="subjectId" class="form-select" required>
                                 <option value="" disabled selected>Select Subject</option>
                                 <c:forEach items="${subjects}" var="s">
@@ -53,7 +52,7 @@
                                 </c:forEach>
                             </select>
                         </div>
-                        <button type="submit" class="btn-primary" style="width: auto; padding: 0.75rem 2rem">Assign Teacher</button>
+                        <button type="submit" class="btn-primary" style="width: auto; padding: 0.75rem 2rem">Add Teacher</button>
                     </div>
                 </form>
 
@@ -61,7 +60,8 @@
                     <thead>
                         <tr>
                             <th>Teacher Name</th>
-                            <th>Assigned Subject</th>
+                            <th>Email</th>
+                            <th>Subject</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -69,12 +69,13 @@
                         <c:forEach items="${teachers}" var="t">
                             <tr>
                                 <td><strong>${t.teacherName}</strong></td>
+                                <td>${t.teacherEmail}</td>
                                 <td>${t.subjectId}</td>
                                 <td>
                                     <form action="admin-dashboard" method="POST" style="display:inline">
                                         <input type="hidden" name="action" value="deleteTeacher">
                                         <input type="hidden" name="id" value="${t.teacherId}">
-                                        <button type="submit" class="btn-delete">Remove Assignment</button>
+                                        <button type="submit" class="btn-delete">Remove</button>
                                     </form>
                                 </td>
                             </tr>

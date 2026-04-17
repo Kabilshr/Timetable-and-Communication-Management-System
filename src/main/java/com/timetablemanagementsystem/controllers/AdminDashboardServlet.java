@@ -46,11 +46,11 @@ public class AdminDashboardServlet extends HttpServlet {
             } else if ("schedule".equals(view)) {
                 List<Subject> subjects = subjectDAO.getAllSubjects();
                 List<TimetableEntry> timetable = timetableDAO.getTimetable(null, null);
-                List<User> teacherUsers = userDAO.getUsersByRole("Teacher");
+                List<Teacher> teachers = teacherDAO.getAllTeachers();
                 
                 request.setAttribute("subjects", subjects);
                 request.setAttribute("timetable", timetable);
-                request.setAttribute("teacherUsers", teacherUsers);
+                request.setAttribute("teachers", teachers);
                 request.getRequestDispatcher("/WEB-INF/pages/manage-schedule.jsp").forward(request, response);
             } else if ("teachers".equals(view)) {
                 List<Subject> subjects = subjectDAO.getAllSubjects();
@@ -99,7 +99,8 @@ public class AdminDashboardServlet extends HttpServlet {
                 break;
             case "addTeacher":
                 Teacher teacher = new Teacher();
-                teacher.setUserId(Integer.parseInt(request.getParameter("userId")));
+                teacher.setTeacherName(request.getParameter("teacherName"));
+                teacher.setTeacherEmail(request.getParameter("teacherEmail"));
                 teacher.setSubjectId(request.getParameter("subjectId"));
                 teacherDAO.addTeacher(teacher);
                 redirectView = "teachers";
@@ -111,10 +112,43 @@ public class AdminDashboardServlet extends HttpServlet {
             case "addTimetable":
                 TimetableEntry entry = new TimetableEntry();
                 entry.setSubjectId(request.getParameter("subjectId"));
-                entry.setTeacherId(Integer.parseInt(request.getParameter("teacherId")));
                 entry.setClassTime(Time.valueOf(request.getParameter("time") + ":00"));
                 entry.setClassDay(request.getParameter("day"));
                 entry.setRoomNumber(request.getParameter("room"));
+
+                String teacherIdStr = request.getParameter("teacherId");
+                if (teacherIdStr != null && !teacherIdStr.equals("manual")) {
+                    // Selected from existing
+                    int tId = Integer.parseInt(teacherIdStr);
+                    entry.setTeacherId(tId);
+                    // Fetch name for consistency in timetable table
+                    List<Teacher> allT = teacherDAO.getAllTeachers();
+                    for(Teacher t : allT) {
+                        if(t.getTeacherId() == tId) {
+                            entry.setTeacherName(t.getTeacherName());
+                            break;
+                        }
+                    }
+                } else {
+                    // Manual entry
+                    String manualName = request.getParameter("manualTeacherName");
+                    String manualEmail = request.getParameter("manualTeacherEmail");
+                    entry.setTeacherName(manualName);
+                    
+                    // Check if exists in teachers table
+                    Teacher existing = teacherDAO.getTeacherByName(manualName);
+                    if (existing == null) {
+                        Teacher newT = new Teacher();
+                        newT.setTeacherName(manualName);
+                        newT.setTeacherEmail(manualEmail);
+                        newT.setSubjectId(entry.getSubjectId());
+                        int newId = teacherDAO.addTeacher(newT);
+                        entry.setTeacherId(newId);
+                    } else {
+                        entry.setTeacherId(existing.getTeacherId());
+                    }
+                }
+                
                 timetableDAO.addEntry(entry);
                 redirectView = "schedule";
                 break;

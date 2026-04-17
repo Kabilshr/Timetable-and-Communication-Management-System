@@ -7,34 +7,63 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TeacherDAO {
-    public boolean addTeacher(Teacher teacher) {
-        String query = "INSERT INTO teachers (user_id, subject_id) VALUES (?, ?)";
+    public int addTeacher(Teacher teacher) {
+        String query = "INSERT INTO teachers (teacher_name, teacher_email, subject_id) VALUES (?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, teacher.getUserId());
-            stmt.setString(2, teacher.getSubjectId());
-            return stmt.executeUpdate() > 0;
+             PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, teacher.getTeacherName());
+            stmt.setString(2, teacher.getTeacherEmail());
+            stmt.setString(3, teacher.getSubjectId());
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows > 0) {
+                try (ResultSet rs = stmt.getGeneratedKeys()) {
+                    if (rs.next()) return rs.getInt(1);
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
+        return -1;
     }
 
     public List<Teacher> getAllTeachers() {
         List<Teacher> teachers = new ArrayList<>();
-        String query = "SELECT t.teacher_id, t.user_id, t.subject_id, u.name FROM teachers t JOIN users u ON t.user_id = u.user_id";
+        String query = "SELECT * FROM teachers";
         try (Connection conn = DBConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
-                Teacher t = new Teacher(rs.getInt("teacher_id"), rs.getInt("user_id"), rs.getString("subject_id"));
-                t.setTeacherName(rs.getString("name"));
-                teachers.add(t);
+                teachers.add(new Teacher(
+                    rs.getInt("teacher_id"),
+                    rs.getString("teacher_name"),
+                    rs.getString("teacher_email"),
+                    rs.getString("subject_id")
+                ));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return teachers;
+    }
+
+    public Teacher getTeacherByName(String name) {
+        String query = "SELECT * FROM teachers WHERE teacher_name = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, name);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Teacher(
+                    rs.getInt("teacher_id"),
+                    rs.getString("teacher_name"),
+                    rs.getString("teacher_email"),
+                    rs.getString("subject_id")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public boolean deleteTeacher(int id) {
