@@ -8,22 +8,18 @@ import java.util.List;
 
 /**
  * Data Access Object for Timetable-related database operations.
+ * Aligned with migration schema (teacher_name stored directly in timetable).
  */
 public class TimetableDAO {
     public boolean addEntry(TimetableEntry entry) {
-        String query = "INSERT INTO timetable (subject_id, teacher_id, teacher_name, class_time, class_day, room_number) VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO timetable (subject_id, teacher_name, class_time, class_day, room_number) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, entry.getSubjectId());
-            if (entry.getTeacherId() > 0) {
-                stmt.setInt(2, entry.getTeacherId());
-            } else {
-                stmt.setNull(2, Types.INTEGER);
-            }
-            stmt.setString(3, entry.getTeacherName());
-            stmt.setTime(4, entry.getClassTime());
-            stmt.setString(5, entry.getClassDay());
-            stmt.setString(6, entry.getRoomNumber());
+            stmt.setString(2, entry.getTeacherName());
+            stmt.setTime(3, entry.getClassTime());
+            stmt.setString(4, entry.getClassDay());
+            stmt.setString(5, entry.getRoomNumber());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -51,7 +47,6 @@ public class TimetableDAO {
                 TimetableEntry entry = new TimetableEntry();
                 entry.setEntryId(rs.getInt("entry_id"));
                 entry.setSubjectId(rs.getString("subject_id"));
-                entry.setTeacherId(rs.getInt("teacher_id"));
                 entry.setTeacherName(rs.getString("teacher_name"));
                 entry.setClassTime(rs.getTime("class_time"));
                 entry.setClassDay(rs.getString("class_day"));

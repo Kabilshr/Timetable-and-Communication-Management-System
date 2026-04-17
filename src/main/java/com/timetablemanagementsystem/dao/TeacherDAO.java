@@ -6,6 +6,10 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object for Teacher-related database operations.
+ * Matches migration schema: teacher_id, teacher_name, teacher_email, subject_id.
+ */
 public class TeacherDAO {
     public int addTeacher(Teacher teacher) {
         String query = "INSERT INTO teachers (teacher_name, teacher_email, subject_id) VALUES (?, ?, ?)";

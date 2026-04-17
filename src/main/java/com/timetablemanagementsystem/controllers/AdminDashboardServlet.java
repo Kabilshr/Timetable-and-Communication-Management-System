@@ -54,11 +54,9 @@ public class AdminDashboardServlet extends HttpServlet {
                 request.getRequestDispatcher("/WEB-INF/pages/manage-schedule.jsp").forward(request, response);
             } else if ("teachers".equals(view)) {
                 List<Subject> subjects = subjectDAO.getAllSubjects();
-                List<User> teacherUsers = userDAO.getUsersByRole("Teacher");
                 List<Teacher> teachers = teacherDAO.getAllTeachers();
                 
                 request.setAttribute("subjects", subjects);
-                request.setAttribute("teacherUsers", teacherUsers);
                 request.setAttribute("teachers", teachers);
                 request.getRequestDispatcher("/WEB-INF/pages/manage-teachers.jsp").forward(request, response);
             } else if ("announcements".equals(view)) {
@@ -118,10 +116,8 @@ public class AdminDashboardServlet extends HttpServlet {
 
                 String teacherIdStr = request.getParameter("teacherId");
                 if (teacherIdStr != null && !teacherIdStr.equals("manual")) {
-                    // Selected from existing
                     int tId = Integer.parseInt(teacherIdStr);
-                    entry.setTeacherId(tId);
-                    // Fetch name for consistency in timetable table
+                    // Fetch name from teachers list
                     List<Teacher> allT = teacherDAO.getAllTeachers();
                     for(Teacher t : allT) {
                         if(t.getTeacherId() == tId) {
@@ -142,10 +138,7 @@ public class AdminDashboardServlet extends HttpServlet {
                         newT.setTeacherName(manualName);
                         newT.setTeacherEmail(manualEmail);
                         newT.setSubjectId(entry.getSubjectId());
-                        int newId = teacherDAO.addTeacher(newT);
-                        entry.setTeacherId(newId);
-                    } else {
-                        entry.setTeacherId(existing.getTeacherId());
+                        teacherDAO.addTeacher(newT);
                     }
                 }
                 
