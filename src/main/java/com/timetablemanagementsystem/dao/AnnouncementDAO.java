@@ -13,8 +13,11 @@ public class AnnouncementDAO {
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, title);
             stmt.setString(2, content);
-            return stmt.executeUpdate() > 0;
+            int rows = stmt.executeUpdate();
+            System.out.println("DEBUG: Announcement added successfully. Rows affected: " + rows);
+            return rows > 0;
         } catch (SQLException e) {
+            System.err.println("DEBUG ERROR: Failed to add announcement: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -34,7 +37,9 @@ public class AnnouncementDAO {
                     rs.getTimestamp("created_at")
                 ));
             }
+            System.out.println("DEBUG: Fetched " + list.size() + " announcements from database.");
         } catch (SQLException e) {
+            System.err.println("DEBUG ERROR: Failed to fetch announcements: " + e.getMessage());
             e.printStackTrace();
         }
         return list;
