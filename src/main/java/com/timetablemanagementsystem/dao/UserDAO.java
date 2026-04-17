@@ -41,7 +41,23 @@ public class UserDAO {
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getPassword());
             stmt.setString(4, user.getRole());
-            return stmt.executeUpdate() > 0;
+            
+            boolean userRegistered = stmt.executeUpdate() > 0;
+            
+            // If user registered and role is Teacher, also add to teachers table
+            if (userRegistered && "Teacher".equalsIgnoreCase(user.getRole())) {
+                String teacherQuery = "INSERT INTO teachers (teacher_name, teacher_email) VALUES (?, ?)";
+                try (PreparedStatement tStmt = conn.prepareStatement(teacherQuery)) {
+                    tStmt.setString(1, user.getName());
+                    tStmt.setString(2, user.getEmail());
+                    tStmt.executeUpdate();
+                } catch (SQLException e) {
+                    System.err.println("Error adding to teachers table during registration: " + e.getMessage());
+                    // We keep the return true because the user account was created successfully
+                }
+            }
+            
+            return userRegistered;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
