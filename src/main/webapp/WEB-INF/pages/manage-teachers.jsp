@@ -36,15 +36,6 @@
                             <label class="form-label">Teacher Email</label>
                             <input type="email" name="teacherEmail" class="form-input" placeholder="e.g. john@example.com" required>
                         </div>
-                        <div class="form-group" style="margin-bottom:0; flex: 1; min-width: 200px;">
-                            <label class="form-label">Primary Subject</label>
-                            <select name="subjectId" class="form-select" required>
-                                <option value="" disabled selected>Select Subject</option>
-                                <c:forEach items="${subjects}" var="s">
-                                    <option value="${s.subjectCode}">${s.subjectName}</option>
-                                </c:forEach>
-                            </select>
-                        </div>
                         <button type="submit" class="btn-primary" style="width: auto; padding: 0.75rem 2rem">Add Teacher</button>
                     </div>
                 </form>
@@ -54,7 +45,6 @@
                         <tr>
                             <th>Teacher Name</th>
                             <th>Email</th>
-                            <th>Subject</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -63,7 +53,6 @@
                             <tr>
                                 <td><strong>${t.teacherName}</strong></td>
                                 <td>${t.teacherEmail}</td>
-                                <td>${t.subjectId}</td>
                                 <td>
                                     <form action="admin-dashboard" method="POST" style="display:inline">
                                         <input type="hidden" name="action" value="deleteTeacher">

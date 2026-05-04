@@ -11,7 +11,6 @@ import java.util.List;
 @WebServlet("/portal")
 public class PortalServlet extends HttpServlet {
     private TimetableDAO timetableDAO = new TimetableDAO();
-    private SubjectDAO subjectDAO = new SubjectDAO();
     private AnnouncementDAO announcementDAO = new AnnouncementDAO();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -22,15 +21,12 @@ public class PortalServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
-        String subjectCode = request.getParameter("subject");
         String day = request.getParameter("day");
 
-        List<TimetableEntry> timetable = timetableDAO.getTimetable(subjectCode, day);
-        List<Subject> subjects = subjectDAO.getAllSubjects();
+        List<TimetableEntry> timetable = timetableDAO.getTimetable();
         List<Announcement> announcements = announcementDAO.getAllAnnouncements();
 
         request.setAttribute("timetable", timetable);
-        request.setAttribute("subjects", subjects);
         request.setAttribute("announcements", announcements);
         request.setAttribute("user", user);
 

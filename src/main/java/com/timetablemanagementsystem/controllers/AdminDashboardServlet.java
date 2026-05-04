@@ -14,7 +14,6 @@ import java.util.List;
  */
 @WebServlet("/admin-dashboard")
 public class AdminDashboardServlet extends HttpServlet {
-    private SubjectDAO subjectDAO = new SubjectDAO();
     private TeacherDAO teacherDAO = new TeacherDAO();
     private TimetableDAO timetableDAO = new TimetableDAO();
     private UserDAO userDAO = new UserDAO();
@@ -51,29 +50,21 @@ public class AdminDashboardServlet extends HttpServlet {
                 request.setAttribute("users", userDAO.getAllUsers());
                 request.getRequestDispatcher("/WEB-INF/pages/admin-dashboard.jsp").forward(request, response);
             } else if ("schedule".equals(view)) {
-                List<Subject> subjects = subjectDAO.getAllSubjects();
-                List<TimetableEntry> timetable = timetableDAO.getTimetable(null, null);
+                List<TimetableEntry> timetable = timetableDAO.getTimetable();
                 List<Teacher> teachers = teacherDAO.getAllTeachers();
                 
-                request.setAttribute("subjects", subjects);
                 request.setAttribute("timetable", timetable);
                 request.setAttribute("teachers", teachers);
                 request.getRequestDispatcher("/WEB-INF/pages/manage-schedule.jsp").forward(request, response);
             } else if ("teachers".equals(view)) {
-                List<Subject> subjects = subjectDAO.getAllSubjects();
                 List<Teacher> teachers = teacherDAO.getAllTeachers();
                 
-                request.setAttribute("subjects", subjects);
                 request.setAttribute("teachers", teachers);
                 request.getRequestDispatcher("/WEB-INF/pages/manage-teachers.jsp").forward(request, response);
             } else if ("announcements".equals(view)) {
                 List<Announcement> announcements = announcementDAO.getAllAnnouncements();
                 request.setAttribute("announcements", announcements);
                 request.getRequestDispatcher("/WEB-INF/pages/manage-announcements.jsp").forward(request, response);
-            } else if ("subjects".equals(view)) {
-                List<Subject> subjects = subjectDAO.getAllSubjects();
-                request.setAttribute("subjects", subjects);
-                request.getRequestDispatcher("/WEB-INF/pages/manage-subjects.jsp").forward(request, response);
             }
         } catch (Exception e) {
             System.err.println("Admin Dashboard Error: " + e.getMessage());
@@ -92,21 +83,10 @@ public class AdminDashboardServlet extends HttpServlet {
         }
 
         switch (action) {
-            case "addSubject":
-                String code = request.getParameter("code");
-                String name = request.getParameter("name");
-                subjectDAO.addSubject(new Subject(code, name));
-                redirectView = "subjects";
-                break;
-            case "deleteSubject":
-                subjectDAO.deleteSubject(request.getParameter("code"));
-                redirectView = "subjects";
-                break;
             case "addTeacher":
                 Teacher teacher = new Teacher();
                 teacher.setTeacherName(request.getParameter("teacherName"));
                 teacher.setTeacherEmail(request.getParameter("teacherEmail"));
-                teacher.setSubjectId(request.getParameter("subjectId"));
                 teacherDAO.addTeacher(teacher);
                 redirectView = "teachers";
                 break;
@@ -116,38 +96,20 @@ public class AdminDashboardServlet extends HttpServlet {
                 break;
             case "addTimetable":
                 TimetableEntry entry = new TimetableEntry();
-                entry.setSubjectId(request.getParameter("subjectId"));
-                entry.setClassTime(Time.valueOf(request.getParameter("time") + ":00"));
-                entry.setClassDay(request.getParameter("day"));
-                entry.setRoomNumber(request.getParameter("room"));
-
-                String teacherIdStr = request.getParameter("teacherId");
-                if (teacherIdStr != null && !teacherIdStr.equals("manual")) {
-                    int tId = Integer.parseInt(teacherIdStr);
-                    // Fetch name from teachers list
-                    List<Teacher> allT = teacherDAO.getAllTeachers();
-                    for(Teacher t : allT) {
-                        if(t.getTeacherId() == tId) {
-                            entry.setTeacherName(t.getTeacherName());
-                            break;
-                        }
-                    }
-                } else {
-                    // Manual entry
-                    String manualName = request.getParameter("manualTeacherName");
-                    String manualEmail = request.getParameter("manualTeacherEmail");
-                    entry.setTeacherName(manualName);
-                    
-                    // Check if exists in teachers table
-                    Teacher existing = teacherDAO.getTeacherByName(manualName);
-                    if (existing == null) {
-                        Teacher newT = new Teacher();
-                        newT.setTeacherName(manualName);
-                        newT.setTeacherEmail(manualEmail);
-                        newT.setSubjectId(entry.getSubjectId());
-                        teacherDAO.addTeacher(newT);
-                    }
-                }
+                entry.setYear(request.getParameter("year"));
+                entry.setSection(request.getParameter("section"));
+                entry.setModuleCode(request.getParameter("moduleCode"));
+                entry.setModuleTitle(request.getParameter("moduleTitle"));
+                entry.setClassType(request.getParameter("classType"));
+                entry.setLecturer(request.getParameter("lecturer"));
+                entry.setBlock(request.getParameter("block"));
+                entry.setRoom(request.getParameter("room"));
+                entry.setDay(request.getParameter("day"));
+                
+                String timeStr = request.getParameter("startTime");
+                String endTimeStr = request.getParameter("endTime");
+                if (timeStr != null && !timeStr.isEmpty()) entry.setStartTime(Time.valueOf(timeStr + ":00"));
+                if (endTimeStr != null && !endTimeStr.isEmpty()) entry.setEndTime(Time.valueOf(endTimeStr + ":00"));
                 
                 timetableDAO.addEntry(entry);
                 redirectView = "schedule";

@@ -10,15 +10,10 @@ import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.*;
 
-/**
- * Controller for the Student Dashboard and its various views.
- * Behaves like AdminDashboardServlet using the 'view' parameter.
- */
 @WebServlet("/student-dashboard")
 public class StudentDashboardServlet extends HttpServlet {
     private TimetableDAO timetableDAO = new TimetableDAO();
     private AnnouncementDAO announcementDAO = new AnnouncementDAO();
-    private SubjectDAO subjectDAO = new SubjectDAO();
     private TeacherDAO teacherDAO = new TeacherDAO();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -41,46 +36,26 @@ public class StudentDashboardServlet extends HttpServlet {
             return;
         }
 
+        String requestedDay = request.getParameter("day");
         String view = request.getParameter("view");
         if (view == null) view = "dashboard";
         request.setAttribute("view", view);
 
         try {
             if ("dashboard".equals(view)) {
-                // Fetch full timetable for filtering
-                List<TimetableEntry> timetable = timetableDAO.getTimetable(null, null);
-                
-                // Get today's classes
                 String today = LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
-                List<TimetableEntry> todayClasses = new ArrayList<>();
-                for (TimetableEntry entry : timetable) {
-                    if (today.equalsIgnoreCase(entry.getClassDay())) {
-                        todayClasses.add(entry);
-                    }
-                }
+                String filterDay = (requestedDay != null) ? requestedDay : today;
+                List<TimetableEntry> timetable = timetableDAO.getTimetable();
                 
-                // Fetch recent announcements
                 List<Announcement> allAnnouncements = announcementDAO.getAllAnnouncements();
                 List<Announcement> recent = allAnnouncements.size() > 3 ? allAnnouncements.subList(0, 3) : allAnnouncements;
 
-                request.setAttribute("todayClasses", todayClasses);
+                request.setAttribute("todayClasses", timetable);
                 request.setAttribute("announcements", recent);
-                request.setAttribute("todayDay", today);
+                request.setAttribute("todayDay", filterDay);
 
             } else if ("schedule".equals(view)) {
-                request.setAttribute("timetable", timetableDAO.getTimetable(null, null));
-
-            } else if ("compare".equals(view)) {
-                String[] selectedSubjects = request.getParameterValues("subjects");
-                List<TimetableEntry> combinedTimetable = new ArrayList<>();
-                if (selectedSubjects != null) {
-                    for (String code : selectedSubjects) {
-                        combinedTimetable.addAll(timetableDAO.getTimetable(code, null));
-                    }
-                }
-                request.setAttribute("subjects", subjectDAO.getAllSubjects());
-                request.setAttribute("combinedTimetable", combinedTimetable);
-                request.setAttribute("selectedSubjects", selectedSubjects != null ? Arrays.asList(selectedSubjects) : new ArrayList<>());
+                request.setAttribute("timetable", timetableDAO.getTimetable());
 
             } else if ("announcements".equals(view)) {
                 request.setAttribute("announcements", announcementDAO.getAllAnnouncements());
@@ -96,13 +71,13 @@ public class StudentDashboardServlet extends HttpServlet {
                     for(Teacher t : teacherDAO.getAllTeachers()) { if(t.getTeacherId() == tId) { teacher = t; break; } }
                     
                     if (teacher != null) {
-                        List<TimetableEntry> teacherSchedule = timetableDAO.getTimetable(null, null, teacher.getTeacherName());
+                        List<TimetableEntry> teacherSchedule = timetableDAO.getTimetable();
                         Map<String, List<String>> freeSlotsByDay = new HashMap<>();
                         for (String day : days) {
                             List<String> freeSlots = new ArrayList<>(allSlots);
                             for (TimetableEntry entry : teacherSchedule) {
-                                if (entry.getClassDay().equalsIgnoreCase(day)) {
-                                    String entryTime = entry.getClassTime().toString().substring(0, 5);
+                                if (entry.getDay().equalsIgnoreCase(day) && entry.getLecturer().equalsIgnoreCase(teacher.getTeacherName())) {
+                                    String entryTime = entry.getStartTime().toString().substring(0, 5);
                                     freeSlots.remove(entryTime);
                                 }
                             }

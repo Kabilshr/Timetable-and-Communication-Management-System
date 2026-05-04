@@ -45,6 +45,26 @@ public class AnnouncementDAO {
         return list;
     }
 
+    public Announcement getAnnouncementById(int id) {
+        String query = "SELECT * FROM announcements WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Announcement(
+                    rs.getInt("id"),
+                    rs.getString("title"),
+                    rs.getString("content"),
+                    rs.getTimestamp("created_at")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public boolean deleteAnnouncement(int id) {
         String query = "DELETE FROM announcements WHERE id = ?";
         try (Connection conn = DBConnection.getConnection();

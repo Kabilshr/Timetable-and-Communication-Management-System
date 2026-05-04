@@ -4,15 +4,13 @@ public class Teacher {
     private int teacherId;
     private String teacherName;
     private String teacherEmail;
-    private String subjectId;
 
     public Teacher() {}
 
-    public Teacher(int teacherId, String teacherName, String teacherEmail, String subjectId) {
+    public Teacher(int teacherId, String teacherName, String teacherEmail) {
         this.teacherId = teacherId;
         this.teacherName = teacherName;
         this.teacherEmail = teacherEmail;
-        this.subjectId = subjectId;
     }
 
     public int getTeacherId() { return teacherId; }
@@ -23,7 +21,4 @@ public class Teacher {
 
     public String getTeacherEmail() { return teacherEmail; }
     public void setTeacherEmail(String teacherEmail) { this.teacherEmail = teacherEmail; }
-
-    public String getSubjectId() { return subjectId; }
-    public void setSubjectId(String subjectId) { this.subjectId = subjectId; }
 }

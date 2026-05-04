@@ -6,18 +6,13 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Data Access Object for Teacher-related database operations.
- * Matches migration schema: teacher_id, teacher_name, teacher_email, subject_id.
- */
 public class TeacherDAO {
     public int addTeacher(Teacher teacher) {
-        String query = "INSERT INTO teachers (teacher_name, teacher_email, subject_id) VALUES (?, ?, ?)";
+        String query = "INSERT INTO teachers (teacher_name, teacher_email) VALUES (?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, teacher.getTeacherName());
             stmt.setString(2, teacher.getTeacherEmail());
-            stmt.setString(3, teacher.getSubjectId());
             int affectedRows = stmt.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -40,8 +35,7 @@ public class TeacherDAO {
                 teachers.add(new Teacher(
                     rs.getInt("teacher_id"),
                     rs.getString("teacher_name"),
-                    rs.getString("teacher_email"),
-                    rs.getString("subject_id")
+                    rs.getString("teacher_email")
                 ));
             }
         } catch (SQLException e) {
@@ -60,8 +54,26 @@ public class TeacherDAO {
                 return new Teacher(
                     rs.getInt("teacher_id"),
                     rs.getString("teacher_name"),
-                    rs.getString("teacher_email"),
-                    rs.getString("subject_id")
+                    rs.getString("teacher_email")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Teacher getTeacherById(int id) {
+        String query = "SELECT * FROM teachers WHERE teacher_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Teacher(
+                    rs.getInt("teacher_id"),
+                    rs.getString("teacher_name"),
+                    rs.getString("teacher_email")
                 );
             }
         } catch (SQLException e) {

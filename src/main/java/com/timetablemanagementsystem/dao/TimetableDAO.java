@@ -6,20 +6,22 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Data Access Object for Timetable-related database operations.
- * Aligned with migration schema (teacher_name stored directly in timetable).
- */
 public class TimetableDAO {
     public boolean addEntry(TimetableEntry entry) {
-        String query = "INSERT INTO timetable (subject_id, teacher_name, class_time, class_day, room_number) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO timetable (year, section, class_type, module_code, module_title, lecturer, block, room, start_time, end_time, day) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, entry.getSubjectId());
-            stmt.setString(2, entry.getTeacherName());
-            stmt.setTime(3, entry.getClassTime());
-            stmt.setString(4, entry.getClassDay());
-            stmt.setString(5, entry.getRoomNumber());
+            stmt.setString(1, entry.getYear());
+            stmt.setString(2, entry.getSection());
+            stmt.setString(3, entry.getClassType());
+            stmt.setString(4, entry.getModuleCode());
+            stmt.setString(5, entry.getModuleTitle());
+            stmt.setString(6, entry.getLecturer());
+            stmt.setString(7, entry.getBlock());
+            stmt.setString(8, entry.getRoom());
+            stmt.setTime(9, entry.getStartTime());
+            stmt.setTime(10, entry.getEndTime());
+            stmt.setString(11, entry.getDay());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -27,32 +29,14 @@ public class TimetableDAO {
         }
     }
 
-    public List<TimetableEntry> getTimetable(String subjectCode, String day) {
+    public List<TimetableEntry> getTimetable() {
         List<TimetableEntry> list = new ArrayList<>();
-        StringBuilder query = new StringBuilder("SELECT tt.*, s.subject_name " +
-                                             "FROM timetable tt " +
-                                             "JOIN subjects s ON tt.subject_id = s.subject_code WHERE 1=1 ");
-        
-        if (subjectCode != null && !subjectCode.isEmpty()) query.append("AND tt.subject_id = ? ");
-        if (day != null && !day.isEmpty()) query.append("AND tt.class_day = ? ");
-
+        String query = "SELECT * FROM timetable";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query.toString())) {
-            int paramIndex = 1;
-            if (subjectCode != null && !subjectCode.isEmpty()) stmt.setString(paramIndex++, subjectCode);
-            if (day != null && !day.isEmpty()) stmt.setString(paramIndex++, day);
-
-            ResultSet rs = stmt.executeQuery();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                TimetableEntry entry = new TimetableEntry();
-                entry.setEntryId(rs.getInt("entry_id"));
-                entry.setSubjectId(rs.getString("subject_id"));
-                entry.setTeacherName(rs.getString("teacher_name"));
-                entry.setClassTime(rs.getTime("class_time"));
-                entry.setClassDay(rs.getString("class_day"));
-                entry.setRoomNumber(rs.getString("room_number"));
-                entry.setSubjectName(rs.getString("subject_name"));
-                list.add(entry);
+                list.add(mapResultSetToEntry(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -84,5 +68,22 @@ public class TimetableDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    private TimetableEntry mapResultSetToEntry(ResultSet rs) throws SQLException {
+        TimetableEntry entry = new TimetableEntry();
+        entry.setEntryId(rs.getInt("entry_id"));
+        entry.setYear(rs.getString("year"));
+        entry.setSection(rs.getString("section"));
+        entry.setClassType(rs.getString("class_type"));
+        entry.setModuleCode(rs.getString("module_code"));
+        entry.setModuleTitle(rs.getString("module_title"));
+        entry.setLecturer(rs.getString("lecturer"));
+        entry.setBlock(rs.getString("block"));
+        entry.setRoom(rs.getString("room"));
+        entry.setStartTime(rs.getTime("start_time"));
+        entry.setEndTime(rs.getTime("end_time"));
+        entry.setDay(rs.getString("day"));
+        return entry;
     }
 }

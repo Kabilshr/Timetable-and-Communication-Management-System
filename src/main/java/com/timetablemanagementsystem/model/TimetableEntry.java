@@ -4,39 +4,53 @@ import java.sql.Time;
 
 public class TimetableEntry {
     private int entryId;
-    private String subjectId;
-    private int teacherId;
-    private Time classTime;
-    private String classDay;
-    private String roomNumber;
-
-    // For display purposes
-    private String subjectName;
-    private String teacherName;
+    private String year;
+    private String section;
+    private String classType;
+    private String moduleCode;
+    private String moduleTitle;
+    private String lecturer;
+    private String block;
+    private String room;
+    private Time startTime;
+    private Time endTime;
+    private String day;
 
     public TimetableEntry() {}
 
     public int getEntryId() { return entryId; }
     public void setEntryId(int entryId) { this.entryId = entryId; }
 
-    public String getSubjectId() { return subjectId; }
-    public void setSubjectId(String subjectId) { this.subjectId = subjectId; }
+    public String getYear() { return year; }
+    public void setYear(String year) { this.year = year; }
 
-    public int getTeacherId() { return teacherId; }
-    public void setTeacherId(int teacherId) { this.teacherId = teacherId; }
+    public String getSection() { return section; }
+    public void setSection(String section) { this.section = section; }
 
-    public Time getClassTime() { return classTime; }
-    public void setClassTime(Time classTime) { this.classTime = classTime; }
+    public String getClassType() { return classType; }
+    public void setClassType(String classType) { this.classType = classType; }
 
-    public String getClassDay() { return classDay; }
-    public void setClassDay(String classDay) { this.classDay = classDay; }
+    public String getModuleCode() { return moduleCode; }
+    public void setModuleCode(String moduleCode) { this.moduleCode = moduleCode; }
 
-    public String getRoomNumber() { return roomNumber; }
-    public void setRoomNumber(String roomNumber) { this.roomNumber = roomNumber; }
+    public String getModuleTitle() { return moduleTitle; }
+    public void setModuleTitle(String moduleTitle) { this.moduleTitle = moduleTitle; }
 
-    public String getSubjectName() { return subjectName; }
-    public void setSubjectName(String subjectName) { this.subjectName = subjectName; }
+    public String getLecturer() { return lecturer; }
+    public void setLecturer(String lecturer) { this.lecturer = lecturer; }
 
-    public String getTeacherName() { return teacherName; }
-    public void setTeacherName(String teacherName) { this.teacherName = teacherName; }
+    public String getBlock() { return block; }
+    public void setBlock(String block) { this.block = block; }
+
+    public String getRoom() { return room; }
+    public void setRoom(String room) { this.room = room; }
+
+    public Time getStartTime() { return startTime; }
+    public void setStartTime(Time startTime) { this.startTime = startTime; }
+
+    public Time getEndTime() { return endTime; }
+    public void setEndTime(Time endTime) { this.endTime = endTime; }
+
+    public String getDay() { return day; }
+    public void setDay(String day) { this.day = day; }
 }

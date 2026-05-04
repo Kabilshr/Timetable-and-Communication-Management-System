@@ -25,10 +25,6 @@
                 <span class="material-symbols-outlined">school</span>
                 <span>Teachers</span>
             </a>
-            <a href="<%= sidePath %>/admin-dashboard?view=subjects" class="sidebar-link ${param.view == 'subjects' ? 'active' : ''}">
-                <span class="material-symbols-outlined">menu_book</span>
-                <span>Subjects</span>
-            </a>
             <a href="<%= sidePath %>/admin-dashboard?view=announcements" class="sidebar-link ${param.view == 'announcements' ? 'active' : ''}">
                 <span class="material-symbols-outlined">campaign</span>
                 <span>Announcements</span>
