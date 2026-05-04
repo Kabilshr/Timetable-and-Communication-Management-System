@@ -50,10 +50,15 @@ public class LoginServlet extends HttpServlet {
             }
 
             // Redirect based on role
-            if ("Admin".equals(user.getRole())) {
-                response.sendRedirect("admin-dashboard");
+            String role = user.getRole();
+            if ("Admin".equalsIgnoreCase(role)) {
+                response.sendRedirect(request.getContextPath() + "/admin-dashboard");
+            } else if ("Student".equalsIgnoreCase(role)) {
+                response.sendRedirect(request.getContextPath() + "/student-dashboard");
+            } else if ("Teacher".equalsIgnoreCase(role)) {
+                response.sendRedirect(request.getContextPath() + "/teacher-dashboard");
             } else {
-                response.sendRedirect("portal");
+                response.sendRedirect(request.getContextPath() + "/portal");
             }
         } else {
             request.setAttribute("error", "Invalid email or password!");

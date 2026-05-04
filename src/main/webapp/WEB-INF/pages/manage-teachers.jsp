@@ -10,26 +10,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="<%= path %>/css/style.css">
-    <style>
-        .btn-delete { color: var(--error); background: none; border: none; cursor: pointer; font-weight: 700; }
-        .add-form { background: var(--surface-container-low); padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem; }
-        .admin-table { width: 100%; border-collapse: collapse; }
-        .admin-table th { text-align: left; padding: 1rem; background: var(--surface-container-high); font-family: var(--font-headline); font-weight: 700; }
-        .admin-table td { padding: 1rem; border-bottom: 1px solid var(--surface-container-high); }
-        .admin-section { background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 2rem; }
-    </style>
 </head>
 <body>
 
 <div class="admin-layout">
     <jsp:include page="components/sidebar.jsp" />
+
     <div class="admin-main">
         <jsp:include page="components/topbar.jsp" />
+
         <div class="admin-content">
-            
             <div class="admin-section">
                 <div class="section-header" style="margin-bottom: 1.5rem;">
-                    <h2>Add New Teacher</h2>
+                    <h2>Manage Teachers</h2>
                 </div>
 
                 <form action="admin-dashboard" method="POST" class="add-form">
@@ -83,7 +76,6 @@
                     </tbody>
                 </table>
             </div>
-
         </div>
     </div>
 </div>

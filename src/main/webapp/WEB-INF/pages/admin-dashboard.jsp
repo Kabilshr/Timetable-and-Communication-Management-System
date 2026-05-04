@@ -10,152 +10,99 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="<%= path %>/css/style.css">
-    <style>
-        /* Specific page adjustments if any */
-        .btn-delete {
-            color: var(--error);
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-weight: 700;
-        }
-        .add-form {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            background: var(--surface-container-low);
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            margin-bottom: 2rem;
-            align-items: flex-end;
-        }
-        .admin-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .admin-table th {
-            text-align: left;
-            padding: 1rem;
-            background: var(--surface-container-high);
-            font-family: var(--font-headline);
-            font-weight: 700;
-        }
-        .admin-table td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--surface-container-high);
-        }
-        .admin-section {
-            background: white;
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            margin-bottom: 2rem;
-        }
-    </style>
 </head>
 <body>
 
 <div class="admin-layout">
-
     <jsp:include page="components/sidebar.jsp" />
 
     <div class="admin-main">
-
         <jsp:include page="components/topbar.jsp" />
 
         <div class="admin-content">
+            <c:set var="view" value="${param.view == null ? 'dashboard' : param.view}" />
             
-            <div class="section-header" style="margin-bottom: 2rem;">
-                <h1>Admin Dashboard Overview</h1>
-                <p class="text-secondary">System statistics at a glance</p>
-            </div>
+            <c:choose>
+                <c:when test="${view == 'dashboard'}">
+                    <div class="section-header">
+                        <h1>System Overview</h1>
+                        <p class="text-secondary">Track institutional growth and user activity</p>
+                    </div>
 
-            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-                <div class="stat-card" style="background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 1.5rem;">
-                    <div class="stat-icon" style="background: var(--primary-container); color: white; width: 60px; height: 60px; border-radius: 1rem; display: flex; align-items: center; justify-content: center;">
-                        <span class="material-symbols-outlined" style="font-size: 32px">group</span>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #e7f3ff; color: var(--primary);">
+                                <span class="material-symbols-outlined">group</span>
+                            </div>
+                            <div class="stat-info">
+                                <p>Total Users</p>
+                                <h2>${totalUsers}</h2>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #fdf2e9; color: #f39c12;">
+                                <span class="material-symbols-outlined">school</span>
+                            </div>
+                            <div class="stat-info">
+                                <p>Students</p>
+                                <h2>${totalStudents}</h2>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #eafaf1; color: #2ecc71;">
+                                <span class="material-symbols-outlined">person_book</span>
+                            </div>
+                            <div class="stat-info">
+                                <p>Teachers</p>
+                                <h2>${totalTeachers}</h2>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #f5eef8; color: #9b59b6;">
+                                <span class="material-symbols-outlined">calendar_month</span>
+                            </div>
+                            <div class="stat-info">
+                                <p>Classes</p>
+                                <h2>${totalClasses}</h2>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <p style="font-weight: 600; color: var(--light-text); margin-bottom: 0.25rem;">Total Users</p>
-                        <h2 style="font-size: 2rem; font-weight: 800; margin: 0;">${totalUsers}</h2>
-                    </div>
-                </div>
 
-                <div class="stat-card" style="background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 1.5rem;">
-                    <div class="stat-icon" style="background: #e3f2fd; color: #1976d2; width: 60px; height: 60px; border-radius: 1rem; display: flex; align-items: center; justify-content: center;">
-                        <span class="material-symbols-outlined" style="font-size: 32px">school</span>
+                    <div class="admin-section">
+                        <div class="section-header">
+                            <h2>User Management</h2>
+                            <button class="btn-primary" style="width: auto; padding: 0.6rem 1.2rem;" onclick="alert('Use registration page to add users')">Add New User</button>
+                        </div>
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach items="${users}" var="u">
+                                    <tr>
+                                        <td>#${u.userId}</td>
+                                        <td style="font-weight: 700;">${u.name}</td>
+                                        <td>${u.email}</td>
+                                        <td>
+                                            <span class="badge" style="background: ${u.role == 'Admin' ? '#fee2e2' : (u.role == 'Teacher' ? '#dcfce7' : '#e0f2fe')}; color: ${u.role == 'Admin' ? '#991b1b' : (u.role == 'Teacher' ? '#166534' : '#0369a1')}">
+                                                ${u.role}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
                     </div>
-                    <div>
-                        <p style="font-weight: 600; color: var(--light-text); margin-bottom: 0.25rem;">Students</p>
-                        <h2 style="font-size: 2rem; font-weight: 800; margin: 0;">${totalStudents}</h2>
-                    </div>
-                </div>
-
-                <div class="stat-card" style="background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 1.5rem;">
-                    <div class="stat-icon" style="background: #f1f8e9; color: #388e3c; width: 60px; height: 60px; border-radius: 1rem; display: flex; align-items: center; justify-content: center;">
-                        <span class="material-symbols-outlined" style="font-size: 32px">person</span>
-                    </div>
-                    <div>
-                        <p style="font-weight: 600; color: var(--light-text); margin-bottom: 0.25rem;">Teachers</p>
-                        <h2 style="font-size: 2rem; font-weight: 800; margin: 0;">${totalTeachers}</h2>
-                    </div>
-                </div>
-
-                <div class="stat-card" style="background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 1.5rem;">
-                    <div class="stat-icon" style="background: #fff3e0; color: #f57c00; width: 60px; height: 60px; border-radius: 1rem; display: flex; align-items: center; justify-content: center;">
-                        <span class="material-symbols-outlined" style="font-size: 32px">event_note</span>
-                    </div>
-                    <div>
-                        <p style="font-weight: 600; color: var(--light-text); margin-bottom: 0.25rem;">Classes</p>
-                        <h2 style="font-size: 2rem; font-weight: 800; margin: 0;">${totalClasses}</h2>
-                    </div>
-                </div>
-            </div>
-
-            <div class="admin-section">
-                <div class="section-header" style="margin-bottom: 1.5rem;">
-                    <h2>Quick Actions</h2>
-                </div>
-                <div style="display: flex; gap: 1rem;">
-                    <a href="admin-dashboard?view=schedule" class="btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
-                        <span class="material-symbols-outlined">add</span> Manage Schedule
-                    </a>
-                    <a href="admin-dashboard?view=announcements" class="btn-primary" style="text-decoration: none; background: var(--secondary); display: inline-flex; align-items: center; gap: 0.5rem;">
-                        <span class="material-symbols-outlined">campaign</span> Post Announcement
-                    </a>
-                </div>
-            </div>
-
-            <!-- User List Table -->
-            <div class="admin-section">
-                <div class="section-header" style="margin-bottom: 1.5rem;">
-                    <h2>System Users</h2>
-                    <p class="text-secondary">Overview of all registered accounts and their roles</p>
-                </div>
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:forEach items="${users}" var="u">
-                            <tr>
-                                <td><strong>${u.name}</strong></td>
-                                <td>${u.email}</td>
-                                <td>
-                                    <span class="badge" style="background: ${u.role == 'Admin' ? '#fff9c4' : (u.role == 'Teacher' ? '#e8f5e9' : '#e3f2fd')}; color: ${u.role == 'Admin' ? '#f57f17' : (u.role == 'Teacher' ? '#2e7d32' : '#1565c0')}; padding: 4px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;">
-                                        ${u.role}
-                                    </span>
-                                </td>
-                            </tr>
-                        </c:forEach>
-                    </tbody>
-                </table>
-            </div>
-
+                </c:when>
+                <c:otherwise>
+                    <jsp:include page="manage-${view}.jsp" />
+                </c:otherwise>
+            </c:choose>
         </div>
     </div>
 </div>

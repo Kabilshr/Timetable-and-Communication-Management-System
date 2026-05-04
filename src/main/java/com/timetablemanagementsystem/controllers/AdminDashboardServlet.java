@@ -28,8 +28,15 @@ public class AdminDashboardServlet extends HttpServlet {
                 return;
             }
             User user = (User) session.getAttribute("user");
-            if (!"Admin".equals(user.getRole())) {
-                response.sendRedirect("portal");
+            String role = user.getRole();
+            if (!"Admin".equalsIgnoreCase(role)) {
+                if ("Student".equalsIgnoreCase(role)) {
+                    response.sendRedirect("student-dashboard");
+                } else if ("Teacher".equalsIgnoreCase(role)) {
+                    response.sendRedirect("teacher-dashboard");
+                } else {
+                    response.sendRedirect("portal");
+                }
                 return;
             }
 
