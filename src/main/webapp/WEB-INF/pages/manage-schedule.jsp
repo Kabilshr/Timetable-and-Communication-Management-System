@@ -58,16 +58,28 @@
                         </div>
                         <div class="form-group" style="margin: 0; flex: 1; min-width: 140px;">
                             <label class="form-label" style="font-size: 0.7rem;">Subject</label>
-                            <select name="subjectId" class="form-select" required>
+                            <select name="moduleCode" class="form-select" required>
                                 <option value="" disabled selected>Subject</option>
                                 <c:forEach items="${subjects}" var="s">
-                                    <option value="${s.subjectCode}">${s.subjectName}</option>
+                                    <option value="${s.moduleCode}">${s.moduleTitle}</option>
                                 </c:forEach>
                             </select>
                         </div>
                         <div class="form-group" style="margin: 0; width: 80px;">
+                            <label class="form-label" style="font-size: 0.7rem;">Year</label>
+                            <input type="text" name="year" class="form-input" style="padding: 0.5rem 0.75rem; font-size: 0.85rem;" placeholder="Year 1" required>
+                        </div>
+                        <div class="form-group" style="margin: 0; width: 80px;">
                             <label class="form-label" style="font-size: 0.7rem;">Section</label>
-                            <input type="text" name="section" class="form-input" style="padding: 0.5rem 0.75rem; font-size: 0.85rem;" placeholder="A">
+                            <input type="text" name="section" class="form-input" style="padding: 0.5rem 0.75rem; font-size: 0.85rem;" placeholder="A" required>
+                        </div>
+                        <div class="form-group" style="margin: 0; width: 100px;">
+                            <label class="form-label" style="font-size: 0.7rem;">Type</label>
+                            <select name="classType" class="form-select" required>
+                                <option value="Lecture">Lecture</option>
+                                <option value="Lab">Lab</option>
+                                <option value="Seminar">Seminar</option>
+                            </select>
                         </div>
                         <div class="form-group" style="margin: 0; flex: 1; min-width: 120px;">
                             <label class="form-label" style="font-size: 0.7rem;">Day</label>
@@ -140,12 +152,12 @@
                     <tbody>
                         <c:forEach items="${timetable}" var="e">
                             <tr>
-                                <td>${e.classDay}</td>
+                                <td>${e.day}</td>
                                 <td>${e.startTime} - ${e.endTime}</td>
-                                <td>${e.subjectName}</td>
+                                <td>${e.moduleTitle}</td>
                                 <td>${e.section}</td>
-                                <td>${e.teacherName}</td>
-                                <td>${e.roomNumber}</td>
+                                <td>${e.lecturerName}</td>
+                                <td>${e.room}</td>
                                 <td>
                                     <form action="admin-dashboard" method="POST" style="display:inline">
                                         <input type="hidden" name="action" value="deleteTimetable">

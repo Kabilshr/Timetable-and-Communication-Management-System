@@ -64,14 +64,14 @@
                                         <div class="today-grid">
                                             <c:forEach items="${todayClasses}" var="tc">
                                                 <div class="today-card">
-                                                    <div style="color: var(--primary); font-weight: 800; font-size: 0.9rem; margin-bottom: 0.5rem;">${fn:substring(tc.classTime, 0, 5)}</div>
-                                                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">${tc.subjectName}</h3>
+                                                    <div style="color: var(--primary); font-weight: 800; font-size: 0.9rem; margin-bottom: 0.5rem;">${fn:substring(tc.startTime, 0, 5)}</div>
+                                                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">${tc.moduleTitle}</h3>
                                                     <div style="display: flex; flex-direction: column; gap: 0.4rem;">
                                                         <span style="font-size: 0.85rem; color: #64748b; display: flex; align-items: center; gap: 0.5rem;">
-                                                            <span class="material-symbols-outlined" style="font-size: 16px;">person</span> ${tc.teacherName}
+                                                            <span class="material-symbols-outlined" style="font-size: 16px;">person</span> ${tc.lecturerName}
                                                         </span>
                                                         <span style="font-size: 0.85rem; color: #64748b; display: flex; align-items: center; gap: 0.5rem;">
-                                                            <span class="material-symbols-outlined" style="font-size: 16px;">location_on</span> Room ${tc.roomNumber}
+                                                            <span class="material-symbols-outlined" style="font-size: 16px;">location_on</span> Room ${tc.room}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -118,8 +118,8 @@
                                 <c:forEach items="${days}" var="day">
                                     <div class="calendar-cell" style="min-height: 120px;">
                                         <c:forEach items="${timetable}" var="entry">
-                                            <c:if test="${entry.classDay == day && fn:substring(entry.classTime, 0, 5) == time}">
-                                                <div class="class-bubble"><strong>${entry.subjectName}</strong><span>${entry.teacherName} • Room ${entry.roomNumber}</span></div>
+                                            <c:if test="${entry.day == day && fn:substring(entry.startTime, 0, 5) == time}">
+                                                <div class="class-bubble"><strong>${entry.moduleTitle}</strong><span>${entry.lecturerName} • Room ${entry.room}</span></div>
                                             </c:if>
                                         </c:forEach>
                                     </div>
@@ -136,8 +136,8 @@
                             <input type="hidden" name="view" value="compare">
                             <c:forEach items="${subjects}" var="s">
                                 <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; background: #f8fafc; padding: 0.5rem 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; cursor: pointer;">
-                                    <input type="checkbox" name="subjects" value="${s.subjectCode}" <c:forEach items="${selectedSubjects}" var="sel"><c:if test="${sel == s.subjectCode}">checked</c:if></c:forEach>>
-                                    ${s.subjectName}
+                                    <input type="checkbox" name="subjects" value="${s.moduleCode}" <c:forEach items="${selectedSubjects}" var="sel"><c:if test="${sel == s.moduleCode}">checked</c:if></c:forEach>>
+                                    ${s.moduleTitle}
                                 </label>
                             </c:forEach>
                             <button type="submit" class="btn-primary" style="width: auto;">Update Comparison</button>
@@ -152,12 +152,12 @@
                                 <div class="time-label">${time}</div>
                                 <c:forEach items="${days}" var="day">
                                     <c:set var="count" value="0" />
-                                    <c:forEach items="${combinedTimetable}" var="e"><c:if test="${e.classDay == day && fn:substring(e.classTime, 0, 5) == time}"><c:set var="count" value="${count + 1}" /></c:if></c:forEach>
+                                    <c:forEach items="${combinedTimetable}" var="e"><c:if test="${e.day == day && fn:substring(e.startTime, 0, 5) == time}"><c:set var="count" value="${count + 1}" /></c:if></c:forEach>
                                     <div class="calendar-cell ${count > 1 ? 'overlap-alert' : ''}">
                                         <c:if test="${count > 1}"><div class="overlap-badge">CONFLICT</div></c:if>
                                         <c:forEach items="${combinedTimetable}" var="e">
-                                            <c:if test="${e.classDay == day && fn:substring(e.classTime, 0, 5) == time}">
-                                                <div class="class-bubble" style="margin-bottom: 4px; padding: 0.5rem;"><strong>${e.subjectName}</strong></div>
+                                            <c:if test="${e.day == day && fn:substring(e.startTime, 0, 5) == time}">
+                                                <div class="class-bubble" style="margin-bottom: 4px; padding: 0.5rem;"><strong>${e.moduleTitle}</strong></div>
                                             </c:if>
                                         </c:forEach>
                                     </div>

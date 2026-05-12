@@ -2,7 +2,9 @@ package com.timetablemanagementsystem.controllers;
 
 import com.google.gson.*;
 import com.timetablemanagementsystem.dao.*;
+import com.timetablemanagementsystem.dao.ModuleDAO;
 import com.timetablemanagementsystem.model.*;
+import com.timetablemanagementsystem.model.Module; // Avoid ambiguity
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,6 +17,9 @@ import java.util.*;
 @MultipartConfig
 public class ScheduleUploadServlet extends HttpServlet {
     private TimetableDAO timetableDAO = new TimetableDAO();
+    private ModuleDAO moduleDAO = new ModuleDAO();
+    private TeacherDAO teacherDAO = new TeacherDAO();
+    private UserDAO userDAO = new UserDAO();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.sendRedirect("admin-dashboard?view=schedule");
@@ -44,13 +49,12 @@ public class ScheduleUploadServlet extends HttpServlet {
                 return;
             }
 
-            // TRUNCATE as per requirement
-            // Note: In a production system, consider a transaction-based approach.
-            // For this project, a manual TRUNCATE execution in the DAO or a specific init method might be cleaner.
-            // Executing manual truncation query here for simplicity as requested.
+            // TRUNCATE timetable as requested for new upload
             try (java.sql.Connection conn = com.timetablemanagementsystem.config.DBConnection.getConnection();
                  java.sql.Statement stmt = conn.createStatement()) {
+                stmt.execute("SET FOREIGN_KEY_CHECKS = 0");
                 stmt.execute("TRUNCATE TABLE timetable");
+                stmt.execute("SET FOREIGN_KEY_CHECKS = 1");
             }
 
             JsonArray entries = jsonElement.getAsJsonArray();
@@ -59,7 +63,7 @@ public class ScheduleUploadServlet extends HttpServlet {
                 JsonObject obj = entryElement.getAsJsonObject();
 
                 try {
-                    // Validation
+                    // 1. Extract Data
                     String year = getAsString(obj, "year");
                     String section = getAsString(obj, "section");
                     String day = getAsString(obj, "day");
@@ -68,14 +72,51 @@ public class ScheduleUploadServlet extends HttpServlet {
                     String classType = getAsString(obj, "class_type");
                     String moduleCode = getAsString(obj, "module_code");
                     String moduleTitle = getAsString(obj, "module_title");
-                    String lecturer = getAsString(obj, "lecturer");
+                    String lecturerName = getAsString(obj, "lecturer");
                     String block = getAsString(obj, "block");
                     String room = getAsString(obj, "room");
 
-                    if (year == null || section == null || day == null || startTimeStr == null || endTimeStr == null) {
+                    if (year == null || section == null || day == null || startTimeStr == null || moduleCode == null || lecturerName == null) {
                         throw new Exception("Missing mandatory fields.");
                     }
 
+                    // 2. Resolve Module
+                    Module module = moduleDAO.getModuleByCode(moduleCode);
+                    if (module == null) {
+                        module = new Module(moduleCode, moduleTitle != null ? moduleTitle : moduleCode);
+                        moduleDAO.addModule(module);
+                    }
+
+                    // 3. Resolve Teacher
+                    Teacher teacher = teacherDAO.getTeacherByName(lecturerName);
+                    if (teacher == null) {
+                        // Check if a User exists with this name. If not, we might need a placeholder user.
+                        // In a real system, lecturers should be pre-registered.
+                        // For this implementation, we search for a user or log an error.
+                        User user = userDAO.getUserByName(lecturerName);
+                        if (user == null) {
+                            // Create a placeholder teacher user if not exists
+                            user = new User();
+                            user.setName(lecturerName);
+                            user.setEmail(lecturerName.toLowerCase().replace(" ", ".") + "@placeholder.com");
+                            user.setPassword("password123");
+                            user.setRole("Teacher");
+                            userDAO.register(user);
+                            user = userDAO.getUserByName(lecturerName);
+                        }
+                        
+                        // Now check if they are in the teachers table
+                        teacher = teacherDAO.getTeacherByUserId(user.getUserId());
+                        if (teacher == null) {
+                            teacher = new Teacher();
+                            teacher.setUserId(user.getUserId());
+                            teacher.setModuleCode(moduleCode);
+                            int tId = teacherDAO.addTeacher(teacher);
+                            teacher = teacherDAO.getTeacherById(tId);
+                        }
+                    }
+
+                    // 4. Create Entry
                     TimetableEntry entry = new TimetableEntry();
                     entry.setYear(year);
                     entry.setSection(section);
@@ -83,9 +124,8 @@ public class ScheduleUploadServlet extends HttpServlet {
                     entry.setStartTime(parseTime(startTimeStr));
                     entry.setEndTime(parseTime(endTimeStr));
                     entry.setClassType(classType);
-                    entry.setModuleCode(moduleCode);
-                    entry.setModuleTitle(moduleTitle);
-                    entry.setLecturer(lecturer);
+                    entry.setModuleCode(module.getModuleCode());
+                    entry.setLecturerId(teacher.getTeacherId());
                     entry.setBlock(block);
                     entry.setRoom(room);
 
@@ -123,7 +163,8 @@ public class ScheduleUploadServlet extends HttpServlet {
                 return Time.valueOf(String.format("%02d:%02d:00", val / 100, val % 100));
             }
             if (timeStr.matches("\\d{1,2}:\\d{2}")) return Time.valueOf(timeStr + ":00");
-            return Time.valueOf(timeStr);
+            if (timeStr.matches("\\d{1,2}:\\d{2}:\\d{2}")) return Time.valueOf(timeStr);
+            return null;
         } catch (Exception e) { return null; }
     }
 }

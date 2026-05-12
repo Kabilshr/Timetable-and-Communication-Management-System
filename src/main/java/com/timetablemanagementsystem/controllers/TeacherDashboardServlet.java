@@ -53,7 +53,7 @@ public class TeacherDashboardServlet extends HttpServlet {
                 String today = LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
                 List<TimetableEntry> todayClasses = new ArrayList<>();
                 for (TimetableEntry entry : timetable) {
-                    if (today.equalsIgnoreCase(entry.getClassDay())) {
+                    if (today.equalsIgnoreCase(entry.getDay())) {
                         todayClasses.add(entry);
                     }
                 }

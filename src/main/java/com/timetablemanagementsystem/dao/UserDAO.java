@@ -46,14 +46,16 @@ public class UserDAO {
             
             // If user registered and role is Teacher, also add to teachers table
             if (userRegistered && "Teacher".equalsIgnoreCase(user.getRole())) {
-                String teacherQuery = "INSERT INTO teachers (teacher_name, teacher_email) VALUES (?, ?)";
-                try (PreparedStatement tStmt = conn.prepareStatement(teacherQuery)) {
-                    tStmt.setString(1, user.getName());
-                    tStmt.setString(2, user.getEmail());
-                    tStmt.executeUpdate();
-                } catch (SQLException e) {
-                    System.err.println("Error adding to teachers table during registration: " + e.getMessage());
-                    // We keep the return true because the user account was created successfully
+                // Get the generated user_id
+                User registeredUser = getUserByName(user.getName());
+                if (registeredUser != null) {
+                    String teacherQuery = "INSERT INTO teachers (user_id) VALUES (?)";
+                    try (PreparedStatement tStmt = conn.prepareStatement(teacherQuery)) {
+                        tStmt.setInt(1, registeredUser.getUserId());
+                        tStmt.executeUpdate();
+                    } catch (SQLException e) {
+                        System.err.println("Error adding to teachers table during registration: " + e.getMessage());
+                    }
                 }
             }
             

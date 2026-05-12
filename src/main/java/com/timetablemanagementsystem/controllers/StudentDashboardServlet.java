@@ -76,7 +76,7 @@ public class StudentDashboardServlet extends HttpServlet {
                         for (String day : days) {
                             List<String> freeSlots = new ArrayList<>(allSlots);
                             for (TimetableEntry entry : teacherSchedule) {
-                                if (entry.getDay().equalsIgnoreCase(day) && entry.getLecturer().equalsIgnoreCase(teacher.getTeacherName())) {
+                                if (entry.getDay().equalsIgnoreCase(day) && entry.getLecturerName().equalsIgnoreCase(teacher.getTeacherName())) {
                                     String entryTime = entry.getStartTime().toString().substring(0, 5);
                                     freeSlots.remove(entryTime);
                                 }

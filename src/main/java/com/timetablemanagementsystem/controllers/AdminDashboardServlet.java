@@ -1,7 +1,9 @@
 package com.timetablemanagementsystem.controllers;
 
 import com.timetablemanagementsystem.dao.*;
+import com.timetablemanagementsystem.dao.ModuleDAO;
 import com.timetablemanagementsystem.model.*;
+import com.timetablemanagementsystem.model.Module;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -18,6 +20,7 @@ public class AdminDashboardServlet extends HttpServlet {
     private TimetableDAO timetableDAO = new TimetableDAO();
     private UserDAO userDAO = new UserDAO();
     private AnnouncementDAO announcementDAO = new AnnouncementDAO();
+    private ModuleDAO moduleDAO = new ModuleDAO();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
@@ -52,9 +55,11 @@ public class AdminDashboardServlet extends HttpServlet {
             } else if ("schedule".equals(view)) {
                 List<TimetableEntry> timetable = timetableDAO.getTimetable();
                 List<Teacher> teachers = teacherDAO.getAllTeachers();
+                List<Module> modules = moduleDAO.getAllModules();
                 
                 request.setAttribute("timetable", timetable);
                 request.setAttribute("teachers", teachers);
+                request.setAttribute("subjects", modules);
                 request.getRequestDispatcher("/WEB-INF/pages/manage-schedule.jsp").forward(request, response);
             } else if ("teachers".equals(view)) {
                 List<Teacher> teachers = teacherDAO.getAllTeachers();
@@ -84,10 +89,12 @@ public class AdminDashboardServlet extends HttpServlet {
 
         switch (action) {
             case "addTeacher":
-                Teacher teacher = new Teacher();
-                teacher.setTeacherName(request.getParameter("teacherName"));
-                teacher.setTeacherEmail(request.getParameter("teacherEmail"));
-                teacherDAO.addTeacher(teacher);
+                User newUser = new User();
+                newUser.setName(request.getParameter("teacherName"));
+                newUser.setEmail(request.getParameter("teacherEmail"));
+                newUser.setPassword("password123"); // Default password
+                newUser.setRole("Teacher");
+                userDAO.register(newUser);
                 redirectView = "teachers";
                 break;
             case "deleteTeacher":
@@ -99,9 +106,8 @@ public class AdminDashboardServlet extends HttpServlet {
                 entry.setYear(request.getParameter("year"));
                 entry.setSection(request.getParameter("section"));
                 entry.setModuleCode(request.getParameter("moduleCode"));
-                entry.setModuleTitle(request.getParameter("moduleTitle"));
                 entry.setClassType(request.getParameter("classType"));
-                entry.setLecturer(request.getParameter("lecturer"));
+                entry.setLecturerId(Integer.parseInt(request.getParameter("teacherId")));
                 entry.setBlock(request.getParameter("block"));
                 entry.setRoom(request.getParameter("room"));
                 entry.setDay(request.getParameter("day"));

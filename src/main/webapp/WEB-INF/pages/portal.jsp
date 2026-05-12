@@ -61,11 +61,11 @@
                             <c:when test="${not empty timetable}">
                                 <c:forEach items="${timetable}" var="entry">
                                     <tr>
-                                        <td><strong>${entry.classDay}</strong></td>
-                                        <td>${entry.classTime}</td>
-                                        <td>${entry.subjectName}</td>
-                                        <td>${entry.teacherName}</td>
-                                        <td><span style="background: var(--surface-container-high); padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 600;">${entry.roomNumber}</span></td>
+                                        <td><strong>${entry.day}</strong></td>
+                                        <td>${entry.startTime} - ${entry.endTime}</td>
+                                        <td>${entry.moduleTitle}</td>
+                                        <td>${entry.lecturerName}</td>
+                                        <td><span style="background: var(--surface-container-high); padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 600;">${entry.room}</span></td>
                                     </tr>
                                 </c:forEach>
                             </c:when>

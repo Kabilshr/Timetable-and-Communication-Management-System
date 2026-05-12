@@ -58,11 +58,11 @@
                                         <div class="today-grid">
                                             <c:forEach items="${todayClasses}" var="tc">
                                                 <div class="today-card">
-                                                    <div style="color: #2e7d32; font-weight: 800; font-size: 0.9rem; margin-bottom: 0.5rem;">${fn:substring(tc.classTime, 0, 5)}</div>
-                                                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">${tc.subjectName}</h3>
-                                                    <div style="display: flex; align-items: center; gap: 0.5rem; color: #64748b; font-size: 0.85rem;">
+                                                    <div style="color: #2e7d32; font-weight: 800; font-size: 0.9rem; margin-bottom: 0.5rem;">${fn:substring(tc.startTime, 0, 5)}</div>
+                                                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">${tc.moduleTitle}</h3>
+                                                    <div style="display: align-items: center; gap: 0.5rem; color: #64748b; font-size: 0.85rem;">
                                                         <span class="material-symbols-outlined" style="font-size: 16px;">location_on</span>
-                                                        Room ${tc.roomNumber}
+                                                        Room ${tc.room}
                                                     </div>
                                                 </div>
                                             </c:forEach>
@@ -108,8 +108,8 @@
                                 <c:forEach items="${days}" var="day">
                                     <div class="calendar-cell" style="min-height: 120px;">
                                         <c:forEach items="${timetable}" var="entry">
-                                            <c:if test="${entry.classDay == day && fn:substring(entry.classTime, 0, 5) == time}">
-                                                <div class="class-bubble"><strong>${entry.subjectName}</strong><span>Room ${entry.roomNumber}</span></div>
+                                            <c:if test="${entry.day == day && fn:substring(entry.startTime, 0, 5) == time}">
+                                                <div class="class-bubble"><strong>${entry.moduleTitle}</strong><span>Room ${entry.room}</span></div>
                                             </c:if>
                                         </c:forEach>
                                     </div>
@@ -168,12 +168,12 @@
                             <c:forEach items="${times}" var="time">
                                 <div class="time-label">${time}</div>
                                 <c:forEach items="${days}" var="day">
-                                    <c:set var="count" value="0" /><c:forEach items="${combinedTimetable}" var="e"><c:if test="${e.classDay == day && fn:substring(e.classTime, 0, 5) == time}"><c:set var="count" value="${count + 1}" /></c:if></c:forEach>
+                                    <c:set var="count" value="0" /><c:forEach items="${combinedTimetable}" var="e"><c:if test="${e.day == day && fn:substring(e.startTime, 0, 5) == time}"><c:set var="count" value="${count + 1}" /></c:if></c:forEach>
                                     <div class="calendar-cell ${count > 1 ? 'overlap-alert' : ''}" style="min-height: 120px;">
                                         <c:if test="${count > 1}"><div class="overlap-badge">OVERLAP</div></c:if>
                                         <c:forEach items="${combinedTimetable}" var="e">
-                                            <c:if test="${e.classDay == day && fn:substring(e.classTime, 0, 5) == time}">
-                                                <div class="event-card ${e.teacherName == currentUser ? 'my-event' : ''}"><strong>${e.subjectName}</strong><br><small>${e.teacherName}</small></div>
+                                            <c:if test="${e.day == day && fn:substring(e.startTime, 0, 5) == time}">
+                                                <div class="event-card ${e.lecturerName == currentUser ? 'my-event' : ''}"><strong>${e.moduleTitle}</strong><br><small>${e.lecturerName}</small></div>
                                             </c:if>
                                         </c:forEach>
                                     </div>
