@@ -38,10 +38,22 @@ public class StudentDashboardServlet extends HttpServlet {
         if (view == null) view = "dashboard";
         request.setAttribute("view", view);
 
+        // Date and Greeting Logic
+        LocalDate now = LocalDate.now();
+        String dayOfWeek = now.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+        String shortDay = now.getDayOfWeek().name().substring(0, 3); // SUN, MON, etc.
+        
+        int hour = java.time.LocalTime.now().getHour();
+        String greeting = (hour < 12) ? "Good Morning" : (hour < 18) ? "Good Afternoon" : "Good Evening";
+
+        request.setAttribute("todayDay", dayOfWeek);
+        request.setAttribute("todayDate", now.format(java.time.format.DateTimeFormatter.ofPattern("MMMM d, yyyy")));
+        request.setAttribute("greeting", greeting);
+
         try {
             if ("dashboard".equals(view)) {
                 Student student = studentDAO.getStudentByUserId(user.getUserId());
-                List<TimetableEntry> timetable = (student != null) ? timetableDAO.getTimetable(null, student.getSectionId(), null) : new ArrayList<>();
+                List<TimetableEntry> timetable = (student != null) ? timetableDAO.getTimetable(null, student.getSectionId(), shortDay) : new ArrayList<>();
                 List<Announcement> announcements = announcementDAO.getAllAnnouncements();
                 
                 request.setAttribute("todayClasses", timetable);
@@ -50,7 +62,16 @@ public class StudentDashboardServlet extends HttpServlet {
 
             } else if ("schedule".equals(view)) {
                 Student student = studentDAO.getStudentByUserId(user.getUserId());
-                request.setAttribute("timetable", (student != null) ? timetableDAO.getTimetable(null, student.getSectionId(), null) : new ArrayList<>());
+                System.out.println("DEBUG: Schedule view for User ID: " + user.getUserId() + ", Student Object: " + student);
+                if (student != null) {
+                    System.out.println("DEBUG: Fetching timetable for Section ID: " + student.getSectionId());
+                    List<TimetableEntry> timetable = timetableDAO.getTimetable(null, student.getSectionId(), null);
+                    System.out.println("DEBUG: Found " + timetable.size() + " timetable entries.");
+                    request.setAttribute("timetable", timetable);
+                } else {
+                    request.setAttribute("timetable", new ArrayList<>());
+                    System.out.println("DEBUG: No student record found, timetable is empty.");
+                }
 
             } else if ("profile".equals(view)) {
                 request.setAttribute("student", studentDAO.getStudentByUserId(user.getUserId()));

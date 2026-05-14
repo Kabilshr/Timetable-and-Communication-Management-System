@@ -31,7 +31,7 @@ public class TimetableDAO {
         return getTimetable(null, -1, null);
     }
 
-    public List<TimetableEntry> getTimetable(String year, int sectionId, String lecturerName) {
+    public List<TimetableEntry> getTimetable(Integer teacherId, Integer sectionId, String day) {
         List<TimetableEntry> list = new ArrayList<>();
         StringBuilder query = new StringBuilder(
             "SELECT t.*, m.module_title, u.name as lecturer_name, sec.year, sec.section_name " +
@@ -42,17 +42,19 @@ public class TimetableDAO {
             "JOIN sections sec ON t.section_id = sec.section_id WHERE 1=1"
         );
 
-        if (year != null) query.append(" AND sec.year = ?");
-        if (sectionId > 0) query.append(" AND t.section_id = ?");
-        if (lecturerName != null) query.append(" AND u.name = ?");
+        if (teacherId != null && teacherId > 0) query.append(" AND t.lecturer_id = ?");
+        if (sectionId != null && sectionId > 0) query.append(" AND t.section_id = ?");
+        if (day != null) query.append(" AND t.day = ?");
+        
+        query.append(" ORDER BY t.start_time ASC");
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query.toString())) {
             
             int paramIndex = 1;
-            if (year != null) stmt.setString(paramIndex++, year);
-            if (sectionId > 0) stmt.setInt(paramIndex++, sectionId);
-            if (lecturerName != null) stmt.setString(paramIndex++, lecturerName);
+            if (teacherId != null && teacherId > 0) stmt.setInt(paramIndex++, teacherId);
+            if (sectionId != null && sectionId > 0) stmt.setInt(paramIndex++, sectionId);
+            if (day != null) stmt.setString(paramIndex++, day);
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {

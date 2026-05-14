@@ -2,6 +2,7 @@
 <% String path = request.getContextPath(); %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,8 +52,8 @@
                     <div style="display: grid; grid-template-columns: 1fr 320px; gap: 2rem;">
                         <div>
                             <div class="welcome-card">
-                                <h1>Welcome back, ${sessionScope.user.name}!</h1>
-                                <p>You have ${fn:length(todayClasses)} classes today (${todayDay}).</p>
+                                <h1>${greeting}, ${sessionScope.user.name}!</h1>
+                                <p>${todayDay}, ${todayDate} | You have ${fn:length(todayClasses)} classes today.</p>
                             </div>
                             <div class="admin-section">
                                 <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
@@ -108,24 +109,79 @@
                 <c:when test="${view == 'schedule'}">
                     <div class="admin-section">
                         <h1>Full Academic Timetable</h1>
-                        <div class="calendar-grid" style="margin-top: 2rem; grid-template-columns: 100px repeat(6, 1fr);">
-                            <div class="calendar-header" style="background: transparent;"></div>
-                            <div class="calendar-header">Sunday</div><div class="calendar-header">Monday</div><div class="calendar-header">Tuesday</div><div class="calendar-header">Wednesday</div><div class="calendar-header">Thursday</div><div class="calendar-header">Friday</div>
-                            <c:set var="days" value="${fn:split('Sunday,Monday,Tuesday,Wednesday,Thursday,Friday', ',')}" />
-                            <c:set var="times" value="${fn:split('08:00,09:00,10:00,11:00,12:00,13:00,14:00,15:00,16:00,17:00', ',')}" />
-                            <c:forEach items="${times}" var="time">
-                                <div class="time-label">${time}</div>
-                                <c:forEach items="${days}" var="day">
-                                    <div class="calendar-cell" style="min-height: 120px;">
-                                        <c:forEach items="${timetable}" var="entry">
-                                            <c:if test="${entry.day == day && fn:substring(entry.startTime, 0, 5) == time}">
-                                                <div class="class-bubble"><strong>${entry.moduleTitle}</strong><span>${entry.lecturerName} • Room ${entry.room}</span></div>
-                                            </c:if>
-                                        </c:forEach>
-                                    </div>
-                                </c:forEach>
-                            </c:forEach>
-                        </div>
+                        <c:choose>
+                            <c:when test="${not empty timetable}">
+                                <style>
+                                    .timetable-grid { 
+                                        display: grid; 
+                                        grid-template-columns: 100px repeat(6, 1fr); 
+                                        grid-template-rows: 60px repeat(12, 120px); 
+                                        gap: 0; 
+                                        border: 1px solid #d6dce5; 
+                                        background: white;
+                                        margin-top: 2rem;
+                                    }
+                                    .grid-time { padding: 0.5rem; background: #f8fafc; text-align: right; font-size: 0.75rem; color: #94a3b8; border-bottom: 1px solid #d6dce5; border-right: 1px solid #d6dce5; }
+                                    .grid-day { padding: 1rem; background: #f8fafc; text-align: center; font-weight: 700; color: #64748b; border-bottom: 2px solid #d6dce5; border-right: 1px solid #d6dce5; }
+                                    .grid-cell { background: white; border-bottom: 1px solid #f8fafc; border-right: 1px solid #f8fafc; z-index: 1; }
+                                    
+                                    .class-block { 
+                                        z-index: 10;
+                                        margin: 6px;
+                                        padding: 12px;
+                                        background: #0059bb; 
+                                        color: white; 
+                                        border-radius: 12px; 
+                                        border-left: 5px solid #003f88;
+                                        box-sizing: border-box;
+                                        display: flex;
+                                        flex-direction: column;
+                                        gap: 6px;
+                                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                                    }
+                                    .block-module { font-weight: 800; font-size: 0.85rem; }
+                                    .block-lecturer { font-weight: 500; opacity: 0.9; font-size: 0.75rem; }
+                                    .block-time { opacity: 0.8; font-size: 0.7rem; }
+                                    .block-room { font-size: 0.7rem; font-weight: 600; opacity: 0.8; }
+                                </style>
+                                <div class="timetable-grid">
+                                    <div class="grid-time"></div>
+                                    <div class="grid-day">Sun</div><div class="grid-day">Mon</div><div class="grid-day">Tue</div><div class="grid-day">Wed</div><div class="grid-day">Thu</div><div class="grid-day">Fri</div>
+                                    
+                                    <c:forEach begin="6" end="17" var="hour">
+                                        <div class="grid-time">${hour}:00</div>
+                                        <c:forEach begin="1" end="6"><div class="grid-cell"></div></c:forEach>
+                                    </c:forEach>
+
+                                    <c:forEach items="${timetable}" var="e">
+                                        <c:set var="startHour" value="${e.startTime.hours}" />
+                                        <c:set var="startMin" value="${e.startTime.minutes}" />
+                                        <c:set var="endHour" value="${e.endTime.hours}" />
+                                        <c:set var="endMin" value="${e.endTime.minutes}" />
+                                        
+                                        <c:set var="startDecimal" value="${startHour + (startMin / 60.0)}" />
+                                        <c:set var="endDecimal" value="${endHour + (endMin / 60.0)}" />
+                                        <c:set var="duration" value="${endDecimal - startDecimal}" />
+                                        <c:set var="gridRowStart" value="${(startDecimal - 6) + 2}" />
+                                        
+                                        <c:set var="dayCol" value="${e.day == 'SUN' ? 2 : e.day == 'MON' ? 3 : e.day == 'TUE' ? 4 : e.day == 'WED' ? 5 : e.day == 'THU' ? 6 : 7}" />
+                                        
+                                        <div class="class-block" style="grid-column: ${dayCol}; grid-row: ${gridRowStart} / span ${duration}">
+                                            <div class="block-module">${e.moduleCode}</div>
+                                            <div class="block-lecturer">${e.lecturerName}</div>
+                                            <div class="block-time">
+                                                <fmt:formatDate value="${e.startTime}" pattern="hh:mm a" /> - 
+                                                <fmt:formatDate value="${e.endTime}" pattern="hh:mm a" />
+                                            </div>
+                                            <div class="block-room">Room ${e.room}</div>
+                                        </div>
+                                    </c:forEach>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <p>No schedule found.</p>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </c:when>
 
