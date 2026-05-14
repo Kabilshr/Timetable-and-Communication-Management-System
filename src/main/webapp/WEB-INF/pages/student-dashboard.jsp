@@ -110,7 +110,10 @@
                     <div class="admin-section">
                         <h1>Full Academic Timetable</h1>
                         <c:choose>
-                            <c:when test="${not empty timetable}">
+                            <c:when test="${not empty timetable}">                                <%-- DEBUG: Data binding check --%>
+                                <div style="background: #eef2f7; padding: 1rem; margin-bottom: 1rem; border-radius: 12px; font-size: 0.8rem;">
+                                    <strong>DEBUG:</strong> Entries = ${fn:length(timetable)}
+                                </div>
                                 <style>
                                     .timetable-scroll { width: 100%; overflow-x: auto; overflow-y: hidden; }
                                     .timetable-wrapper { min-width: 800px; position: relative; margin-top: 2rem; border: 1px solid #d6dce5; }

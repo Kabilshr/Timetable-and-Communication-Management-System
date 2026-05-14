@@ -47,6 +47,8 @@ public class TimetableDAO {
         if (day != null) query.append(" AND t.day = ?");
         
         query.append(" ORDER BY t.start_time ASC");
+        
+        System.out.println("DEBUG: Executing Timetable query: " + query.toString() + " | teacherId=" + teacherId + ", sectionId=" + sectionId + ", day=" + day);
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query.toString())) {
@@ -60,8 +62,10 @@ public class TimetableDAO {
             while (rs.next()) {
                 list.add(mapResultSetToEntry(rs));
             }
+            System.out.println("DEBUG: Timetable query returned " + list.size() + " rows");
         } catch (SQLException e) {
             e.printStackTrace();
+            System.err.println("DEBUG: SQL Exception in getTimetable: " + e.getMessage());
         }
         return list;
     }

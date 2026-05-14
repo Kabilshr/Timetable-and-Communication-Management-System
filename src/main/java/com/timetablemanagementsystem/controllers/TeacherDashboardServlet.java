@@ -21,15 +21,19 @@ public class TeacherDashboardServlet extends HttpServlet {
     private TeacherDAO teacherDAO = new TeacherDAO();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("DEBUG: TeacherDashboardServlet reached");
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
+            System.out.println("DEBUG: No session or user found, redirecting to login");
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
         User user = (User) session.getAttribute("user");
         String role = user.getRole();
+        System.out.println("DEBUG: User role: " + role + ", user_id: " + user.getUserId());
         if (!"Teacher".equalsIgnoreCase(role)) {
+            System.out.println("DEBUG: Role is not Teacher, redirecting based on role");
             if ("Admin".equalsIgnoreCase(role)) {
                 response.sendRedirect(request.getContextPath() + "/admin-dashboard");
             } else if ("Student".equalsIgnoreCase(role)) {
@@ -40,14 +44,22 @@ public class TeacherDashboardServlet extends HttpServlet {
             return;
         }
 
+        // Get matching teacher record
+        Teacher teacher = teacherDAO.getTeacherByUserId(user.getUserId());
+        int teacherId = (teacher != null) ? teacher.getTeacherId() : -1;
+        System.out.println("DEBUG: Logged in teacher user_id=" + user.getUserId() + ", teacher_id=" + teacherId);
+
         String view = request.getParameter("view");
         if (view == null) view = "dashboard";
         request.setAttribute("view", view);
+        System.out.println("DEBUG: View parameter: " + view);
 
         try {
+            System.out.println("DEBUG: Entering try block, view: " + view);
             if ("dashboard".equals(view)) {
                 // Fetch personal schedule
-                List<TimetableEntry> timetable = timetableDAO.getTimetable(null, -1, user.getName());
+                List<TimetableEntry> timetable = timetableDAO.getTimetable(teacherId, -1, null); 
+                System.out.println("DEBUG: Timetable size: " + timetable.size());
                 
                 // Get today's classes
                 String today = LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
@@ -57,6 +69,7 @@ public class TeacherDashboardServlet extends HttpServlet {
                         todayClasses.add(entry);
                     }
                 }
+                System.out.println("DEBUG: Today's classes count: " + todayClasses.size());
                 
                 // Fetch recent announcements
                 List<Announcement> announcements = announcementDAO.getAllAnnouncements();
@@ -67,34 +80,56 @@ public class TeacherDashboardServlet extends HttpServlet {
                 request.setAttribute("todayDay", today);
 
             } else if ("schedule".equals(view)) {
-                request.setAttribute("timetable", timetableDAO.getTimetable(null, -1, user.getName()));
+                List<TimetableEntry> timetable = timetableDAO.getTimetable(teacherId, -1, null);
+                System.out.println("DEBUG: Schedule view, teacher_id=" + teacherId + ", timetable size: " + timetable.size());
+                request.setAttribute("timetable", timetable);
 
             } else if ("announcements".equals(view)) {
-                request.setAttribute("announcements", announcementDAO.getAllAnnouncements());
+                List<Announcement> announcements = announcementDAO.getAllAnnouncements();
+                System.out.println("DEBUG: Announcements view, count: " + announcements.size());
+                request.setAttribute("announcements", announcements);
 
             } else if ("collaboration".equals(view)) {
-                String[] selectedTeachers = request.getParameterValues("teachers");
+                String[] selectedTeacherIds = request.getParameterValues("teachers");
+                System.out.println("DEBUG: Logged in teacher_id = " + teacherId);
+                System.out.println("DEBUG: Selected teacher_ids = " + (selectedTeacherIds != null ? Arrays.toString(selectedTeacherIds) : "none"));
+                
                 List<TimetableEntry> combinedTimetable = new ArrayList<>();
                 
-                // Always include current teacher
-                combinedTimetable.addAll(timetableDAO.getTimetable(null, -1, user.getName()));
+                // Fetch current teacher
+                List<TimetableEntry> currentTeacherEntries = timetableDAO.getTimetable(teacherId, -1, null);
+                combinedTimetable.addAll(currentTeacherEntries);
+                System.out.println("DEBUG: Current teacher entries = " + currentTeacherEntries.size());
 
-                if (selectedTeachers != null) {
-                    for (String teacherName : selectedTeachers) {
-                        if (!teacherName.equalsIgnoreCase(user.getName())) {
-                            combinedTimetable.addAll(timetableDAO.getTimetable(null, -1, teacherName));
+                if (selectedTeacherIds != null) {
+                    for (String tIdStr : selectedTeacherIds) {
+                        try {
+                            int tId = Integer.parseInt(tIdStr);
+                            if (tId != teacherId) {
+                                List<TimetableEntry> selectedTeacherEntries = timetableDAO.getTimetable(tId, -1, null);
+                                combinedTimetable.addAll(selectedTeacherEntries);
+                                System.out.println("DEBUG: Selected teacher_id " + tId + " entries = " + selectedTeacherEntries.size());
+                            }
+                        } catch (NumberFormatException e) {
+                            System.err.println("DEBUG: Invalid teacher ID: " + tIdStr);
                         }
                     }
                 }
+                
+                System.out.println("DEBUG: Combined entries = " + combinedTimetable.size());
 
                 request.setAttribute("allTeachers", teacherDAO.getAllTeachers());
                 request.setAttribute("combinedTimetable", combinedTimetable);
-                request.setAttribute("selectedTeachers", selectedTeachers != null ? Arrays.asList(selectedTeachers) : new ArrayList<>());
+                request.setAttribute("selectedTeachers", selectedTeacherIds != null ? Arrays.asList(selectedTeacherIds) : new ArrayList<>());
                 request.setAttribute("currentUser", user.getName());
+                request.setAttribute("teacherId", teacherId);
             }
 
-            request.getRequestDispatcher("/WEB-INF/pages/teacher-dashboard.jsp").forward(request, response);
+            String jspPath = "/WEB-INF/pages/teacher-dashboard.jsp";
+            System.out.println("DEBUG: Final check - Forwarding to: " + jspPath);
+            request.getRequestDispatcher(jspPath).forward(request, response);
         } catch (Exception e) {
+            System.err.println("DEBUG: Error in TeacherDashboardServlet: " + e.getMessage());
             e.printStackTrace();
             throw new ServletException(e);
         }
@@ -113,10 +148,10 @@ public class TeacherDashboardServlet extends HttpServlet {
             String content = request.getParameter("content");
             if (title != null && content != null) {
                 announcementDAO.addAnnouncement(title, content);
-                response.sendRedirect("teacher-dashboard?view=announcements&success=true");
+                response.sendRedirect(request.getContextPath() + "/teacher-dashboard?view=announcements&success=true");
                 return;
             }
         }
-        response.sendRedirect("teacher-dashboard");
+        response.sendRedirect(request.getContextPath() + "/teacher-dashboard");
     }
 }

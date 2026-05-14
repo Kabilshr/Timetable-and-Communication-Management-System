@@ -2,6 +2,7 @@
 <% String path = request.getContextPath(); %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -98,24 +99,49 @@
                 <c:when test="${view == 'schedule'}">
                     <div class="admin-section">
                         <h1>Personal Teaching Timetable</h1>
-                        <div class="calendar-grid" style="margin-top: 2rem; grid-template-columns: 100px repeat(6, 1fr);">
-                            <div class="calendar-header" style="background: transparent;"></div>
-                            <div class="calendar-header">Sunday</div><div class="calendar-header">Monday</div><div class="calendar-header">Tuesday</div><div class="calendar-header">Wednesday</div><div class="calendar-header">Thursday</div><div class="calendar-header">Friday</div>
-                            <c:set var="days" value="${fn:split('Sunday,Monday,Tuesday,Wednesday,Thursday,Friday', ',')}" />
-                            <c:set var="times" value="${fn:split('08:00,09:00,10:00,11:00,12:00,13:00,14:00,15:00,16:00,17:00', ',')}" />
-                            <c:forEach items="${times}" var="time">
-                                <div class="time-label">${time}</div>
-                                <c:forEach items="${days}" var="day">
-                                    <div class="calendar-cell" style="min-height: 120px;">
-                                        <c:forEach items="${timetable}" var="entry">
-                                            <c:if test="${entry.day == day && fn:substring(entry.startTime, 0, 5) == time}">
-                                                <div class="class-bubble"><strong>${entry.moduleTitle}</strong><span>Room ${entry.room}</span></div>
-                                            </c:if>
-                                        </c:forEach>
+                                <link rel="stylesheet" href="<%=request.getContextPath()%>/css/calendar.css">
+                                <div class="timetable-container">
+                                    <div class="timetable-scroll">
+                                        <div class="timetable-wrapper">
+                                            <div class="timetable-grid">
+                                                <div class="grid-time" style="height: 56px;"></div>
+                                                <div class="day-header">SUN</div><div class="day-header">MON</div><div class="day-header">TUE</div><div class="day-header">WED</div><div class="day-header">THU</div><div class="day-header">FRI</div>
+                                                
+                                                <c:forEach begin="6" end="17" var="hour">
+                                                    <div class="grid-time">${hour}:00</div>
+                                                    <c:forEach begin="1" end="6"><div class="grid-cell"></div></c:forEach>
+                                                </c:forEach>
+                                            </div>
+                                            <div class="overlay-layer">
+                                                <c:set var="days" value="${fn:split('SUN,MON,TUE,WED,THU,FRI', ',')}" />
+                                                <c:forEach items="${days}" var="day">
+                                                    <div class="day-column">
+                                                        <c:forEach items="${timetable}" var="e">
+                                                            <c:if test="${e.day == day}">
+                                                                <c:set var="startMinutes" value="${(e.startTime.hours * 60) + e.startTime.minutes}" />
+                                                                <c:set var="endMinutes" value="${(e.endTime.hours * 60) + e.endTime.minutes}" />
+                                                                
+                                                                <c:set var="minutesFromStart" value="${startMinutes - 360}" />
+                                                                <c:set var="top" value="${(minutesFromStart * 2) + 56}" />
+                                                                <c:set var="height" value="${(endMinutes - startMinutes) * 2}" />
+                                                                
+                                                                <div class="class-block" style="top: ${top}px; height: ${height}px;">
+                                                                    <div class="block-module">${e.moduleCode}</div>
+                                                                    <div class="block-lecturer">${e.lecturerName}</div>
+                                                                    <div class="block-time">
+                                                                        <fmt:formatDate value="${e.startTime}" pattern="hh:mm a" /> - 
+                                                                        <fmt:formatDate value="${e.endTime}" pattern="hh:mm a" />
+                                                                    </div>
+                                                                    <div class="block-room">Room ${e.room}</div>
+                                                                </div>
+                                                            </c:if>
+                                                        </c:forEach>
+                                                    </div>
+                                                </c:forEach>
+                                            </div>
+                                        </div>
                                     </div>
-                                </c:forEach>
-                            </c:forEach>
-                        </div>
+                                </div>
                     </div>
                 </c:when>
 
@@ -147,12 +173,19 @@
                     <div class="admin-section">
                         <h1>Teacher Collaboration</h1>
                         <div style="margin: 1.5rem 0;">
+                            <!-- DEBUG OUTPUT -->
+                            <div style="background: #fff3cd; padding: 10px; margin-bottom: 10px;">
+                                Count: ${fn:length(combinedTimetable)}<br>
+                                <c:forEach var="e" items="${combinedTimetable}">
+                                    ${e.moduleCode} | ${e.day} | ${e.startTime}<br>
+                                </c:forEach>
+                            </div>
                             <form action="teacher-dashboard" method="GET" style="display: flex; flex-wrap: wrap; gap: 1rem;">
                                 <input type="hidden" name="view" value="collaboration">
                                 <c:forEach items="${allTeachers}" var="t">
-                                    <c:if test="${t.teacherName != currentUser}">
+                                    <c:if test="${t.teacherId != teacherId}">
                                         <label style="display: flex; align-items: center; gap: 0.5rem; background: #f8fafc; padding: 0.5rem 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; font-size: 0.85rem; cursor: pointer;">
-                                            <input type="checkbox" name="teachers" value="${t.teacherName}" <c:forEach items="${selectedTeachers}" var="sel"><c:if test="${sel == t.teacherName}">checked</c:if></c:forEach>>
+                                            <input type="checkbox" name="teachers" value="${t.teacherId}" <c:forEach items="${selectedTeachers}" var="sel"><c:if test="${sel == t.teacherId}">checked</c:if></c:forEach>>
                                             ${t.teacherName}
                                         </label>
                                     </c:if>
@@ -173,7 +206,7 @@
                                         <c:if test="${count > 1}"><div class="overlap-badge">OVERLAP</div></c:if>
                                         <c:forEach items="${combinedTimetable}" var="e">
                                             <c:if test="${e.day == day && fn:substring(e.startTime, 0, 5) == time}">
-                                                <div class="event-card ${e.lecturerName == currentUser ? 'my-event' : ''}"><strong>${e.moduleTitle}</strong><br><small>${e.lecturerName}</small></div>
+                                                <div class="event-card ${e.lecturerId == teacherId ? 'my-event' : 'compare-event'}"><strong>${e.moduleTitle}</strong><br><small>${e.lecturerName}</small></div>
                                             </c:if>
                                         </c:forEach>
                                     </div>
