@@ -112,23 +112,28 @@
                         <c:choose>
                             <c:when test="${not empty timetable}">
                                 <style>
-                                    .timetable-container { position: relative; margin-top: 2rem; border: 1px solid #d6dce5; }
+                                    .timetable-scroll { width: 100%; overflow-x: auto; overflow-y: hidden; }
+                                    .timetable-wrapper { min-width: 800px; position: relative; margin-top: 2rem; border: 1px solid #d6dce5; }
                                     .timetable-grid { 
                                         display: grid; 
-                                        grid-template-columns: 100px repeat(6, 1fr); 
+                                        grid-template-columns: 80px repeat(6, 1fr); 
                                         grid-auto-rows: 120px;
                                         background: white;
                                     }
                                     .grid-time { padding: 0.5rem; background: #f8fafc; text-align: right; font-size: 0.75rem; color: #94a3b8; border-bottom: 1px solid #d6dce5; border-right: 1px solid #d6dce5; }
-                                    .grid-day { padding: 1rem; background: #f8fafc; text-align: center; font-weight: 700; color: #64748b; border-bottom: 2px solid #d6dce5; border-right: 1px solid #d6dce5; }
+                                    .grid-day { 
+                                        height: 48px; padding: 0; font-size: 0.95rem; font-weight: 700; color: #64748b; 
+                                        display: flex; align-items: center; justify-content: center;
+                                        background: #f8fafc; border-bottom: 2px solid #d6dce5; border-right: 1px solid #d6dce5; 
+                                    }
                                     .grid-cell { background: white; border-bottom: 1px solid #f8fafc; border-right: 1px solid #f8fafc; }
                                     
                                     .overlay-layer {
                                         position: absolute;
-                                        top: 60px; /* Header height */
-                                        left: 100px;
+                                        top: 48px; /* New compact header height */
+                                        left: 80px;
                                         right: 0;
-                                        height: 1440px; /* 12 hours * 120px */
+                                        height: 1440px; 
                                         display: grid;
                                         grid-template-columns: repeat(6, 1fr);
                                         pointer-events: none;
@@ -141,59 +146,65 @@
                                         right: 4px;
                                         pointer-events: auto;
                                         z-index: 10;
-                                        padding: 8px;
+                                        padding: 6px;
                                         background: #0059bb; 
                                         color: white; 
-                                        border-radius: 8px; 
+                                        border-radius: 6px; 
                                         border-left: 4px solid #003f88;
                                         box-sizing: border-box;
                                         display: flex;
                                         flex-direction: column;
-                                        gap: 2px;
+                                        gap: 1px;
                                         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                                         overflow: hidden;
                                     }
-                                    .block-module { font-weight: 800; font-size: 0.75rem; }
-                                    .block-lecturer { font-weight: 500; opacity: 0.9; font-size: 0.7rem; }
-                                    .block-time { opacity: 0.8; font-size: 0.65rem; }
-                                    .block-room { font-size: 0.65rem; font-weight: 600; opacity: 0.8; }
+                                    .block-module { font-weight: 800; font-size: 0.7rem; }
+                                    .block-lecturer { font-weight: 500; opacity: 0.9; font-size: 0.65rem; }
+                                    .block-time, .block-room { opacity: 0.8; font-size: 0.6rem; }
+
+                                    @media (max-width: 768px) {
+                                        .class-block { padding: 4px; }
+                                        .block-module { font-size: 0.65rem; }
+                                    }
                                 </style>
-                                <div class="timetable-container">
-                                    <div class="timetable-grid">
-                                        <div class="grid-time"></div>
-                                        <div class="grid-day">Sun</div><div class="grid-day">Mon</div><div class="grid-day">Tue</div><div class="grid-day">Wed</div><div class="grid-day">Thu</div><div class="grid-day">Fri</div>
-                                        
-                                        <c:forEach begin="6" end="17" var="hour">
-                                            <div class="grid-time">${hour}:00</div>
-                                            <c:forEach begin="1" end="6"><div class="grid-cell"></div></c:forEach>
-                                        </c:forEach>
-                                    </div>
-                                    <div class="overlay-layer">
-                                        <c:set var="days" value="${fn:split('SUN,MON,TUE,WED,THU,FRI', ',')}" />
-                                        <c:forEach items="${days}" var="day">
-                                            <div class="day-column">
-                                                <c:forEach items="${timetable}" var="e">
-                                                    <c:if test="${e.day == day}">
-                                                        <c:set var="startMinutes" value="${(e.startTime.hours * 60) + e.startTime.minutes}" />
-                                                        <c:set var="endMinutes" value="${(e.endTime.hours * 60) + e.endTime.minutes}" />
-                                                        
-                                                        <c:set var="minutesFromStart" value="${startMinutes - 360}" />
-                                                        <c:set var="top" value="${(minutesFromStart * 2) + 60}" />
-                                                        <c:set var="height" value="${(endMinutes - startMinutes) * 2}" />
-                                                        
-                                                        <div class="class-block" style="top: ${top}px; height: ${height}px;">
-                                                            <div class="block-module">${e.moduleCode}</div>
-                                                            <div class="block-lecturer">${e.lecturerName}</div>
-                                                            <div class="block-time">
-                                                                <fmt:formatDate value="${e.startTime}" pattern="hh:mm a" /> - 
-                                                                <fmt:formatDate value="${e.endTime}" pattern="hh:mm a" />
+                                <div class="timetable-scroll">
+                                    <div class="timetable-wrapper">
+                                        <div class="timetable-grid">
+                                            <div class="grid-time"></div>
+                                            <div class="grid-day">Sun</div><div class="grid-day">Mon</div><div class="grid-day">Tue</div><div class="grid-day">Wed</div><div class="grid-day">Thu</div><div class="grid-day">Fri</div>
+                                            
+                                            <c:forEach begin="6" end="17" var="hour">
+                                                <div class="grid-time">${hour}:00</div>
+                                                <c:forEach begin="1" end="6"><div class="grid-cell"></div></c:forEach>
+                                            </c:forEach>
+                                        </div>
+                                        <div class="overlay-layer">
+                                            <c:set var="days" value="${fn:split('SUN,MON,TUE,WED,THU,FRI', ',')}" />
+                                            <c:forEach items="${days}" var="day">
+                                                <div class="day-column">
+                                                    <c:forEach items="${timetable}" var="e">
+                                                        <c:if test="${e.day == day}">
+                                                            <c:set var="startMinutes" value="${(e.startTime.hours * 60) + e.startTime.minutes}" />
+                                                            <c:set var="endMinutes" value="${(e.endTime.hours * 60) + e.endTime.minutes}" />
+                                                            
+                                                            <c:set var="minutesFromStart" value="${startMinutes - 360}" />
+                                                            <c:set var="top" value="${(minutesFromStart * 2) + 48}" />
+                                                            <c:set var="height" value="${(endMinutes - startMinutes) * 2}" />
+                                                            
+                                                            <div class="class-block" style="top: ${top}px; height: ${height}px;">
+                                                                <div class="block-module">${e.moduleCode}</div>
+                                                                <div class="block-lecturer">${e.lecturerName}</div>
+                                                                <div class="block-time">
+                                                                    <fmt:formatDate value="${e.startTime}" pattern="hh:mm a" /> - 
+                                                                    <fmt:formatDate value="${e.endTime}" pattern="hh:mm a" />
+                                                                </div>
+                                                                <div class="block-room">Room ${e.room}</div>
                                                             </div>
-                                                            <div class="block-room">Room ${e.room}</div>
-                                                        </div>
-                                                    </c:if>
-                                                </c:forEach>
-                                            </div>
-                                        </c:forEach>
+                                                        </c:if>
+                                                    </c:forEach>
+                                                </div>
+                                            </c:forEach>
+                                        </div>
                                     </div>
                                 </div>
                             </c:when>
