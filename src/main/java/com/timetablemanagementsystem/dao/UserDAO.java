@@ -6,9 +6,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Data Access Object for User-related database operations.
- */
 public class UserDAO {
     public User login(String email, String password) {
         String query = "SELECT * FROM users WHERE email = ? AND password = ?";
@@ -27,7 +24,6 @@ public class UserDAO {
                 );
             }
         } catch (SQLException e) {
-            System.out.println("Login Error: " + e.getMessage());
             e.printStackTrace();
         }
         return null;
@@ -36,30 +32,38 @@ public class UserDAO {
     public boolean register(User user) {
         String query = "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, user.getName());
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getPassword());
             stmt.setString(4, user.getRole());
             
-            boolean userRegistered = stmt.executeUpdate() > 0;
-            
-            // If user registered and role is Teacher, also add to teachers table
-            if (userRegistered && "Teacher".equalsIgnoreCase(user.getRole())) {
-                // Get the generated user_id
-                User registeredUser = getUserByName(user.getName());
-                if (registeredUser != null) {
-                    String teacherQuery = "INSERT INTO teachers (user_id) VALUES (?)";
-                    try (PreparedStatement tStmt = conn.prepareStatement(teacherQuery)) {
-                        tStmt.setInt(1, registeredUser.getUserId());
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) return false;
+
+            int userId = -1;
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    userId = generatedKeys.getInt(1);
+                }
+            }
+
+            if (userId != -1) {
+                if ("Teacher".equalsIgnoreCase(user.getRole())) {
+                    String tQuery = "INSERT INTO teachers (user_id) VALUES (?)";
+                    try (PreparedStatement tStmt = conn.prepareStatement(tQuery)) {
+                        tStmt.setInt(1, userId);
                         tStmt.executeUpdate();
-                    } catch (SQLException e) {
-                        System.err.println("Error adding to teachers table during registration: " + e.getMessage());
+                    }
+                } else if ("Student".equalsIgnoreCase(user.getRole())) {
+                    String sQuery = "INSERT INTO students (user_id) VALUES (?)";
+                    try (PreparedStatement sStmt = conn.prepareStatement(sQuery)) {
+                        sStmt.setInt(1, userId);
+                        sStmt.executeUpdate();
                     }
                 }
             }
-            
-            return userRegistered;
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -67,15 +71,20 @@ public class UserDAO {
     }
 
     public boolean updateProfile(User user) {
-        String query = "UPDATE users SET name = ?, email = ?, password = ? WHERE user_id = ?";
+        System.out.println("DEBUG: UserDAO.updateProfile called for user_id: " + user.getUserId());
+        String query = "UPDATE users SET name = ?, email = ? WHERE user_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, user.getName());
             stmt.setString(2, user.getEmail());
-            stmt.setString(3, user.getPassword());
-            stmt.setInt(4, user.getUserId());
-            return stmt.executeUpdate() > 0;
+            stmt.setInt(3, user.getUserId());
+            
+            System.out.println("DEBUG: Executing SQL: " + query + " with params [" + user.getName() + ", " + user.getEmail() + ", " + user.getUserId() + "]");
+            int rowsAffected = stmt.executeUpdate();
+            System.out.println("DEBUG: SQL execution completed. Rows affected: " + rowsAffected);
+            return rowsAffected > 0;
         } catch (SQLException e) {
+            System.err.println("DEBUG SQL ERROR in UserDAO.updateProfile: " + e.getMessage());
             e.printStackTrace();
             return false;
         }

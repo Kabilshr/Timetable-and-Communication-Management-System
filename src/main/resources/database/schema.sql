@@ -53,5 +53,18 @@ CREATE TABLE IF NOT EXISTS announcements (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- =========================================
+-- ANNOUNCEMENTS TABLE
+-- =========================================
+CREATE TABLE announcements (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    title VARCHAR(255) NOT NULL,
+
+    content TEXT NOT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Initial Admin Account
 INSERT IGNORE INTO users (name, email, password, role) VALUES ('Admin', 'admin@school.com', 'admin123', 'Admin');

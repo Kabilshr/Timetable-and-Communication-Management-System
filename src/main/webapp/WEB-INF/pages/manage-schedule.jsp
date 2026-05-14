@@ -57,21 +57,22 @@
                             </select>
                         </div>
                         <div class="form-group" style="margin: 0; flex: 1; min-width: 140px;">
-                            <label class="form-label" style="font-size: 0.7rem;">Subject</label>
+                            <label class="form-label" style="font-size: 0.7rem;">Module</label>
                             <select name="moduleCode" class="form-select" required>
-                                <option value="" disabled selected>Subject</option>
-                                <c:forEach items="${subjects}" var="s">
+                                <option value="" disabled selected>Module</option>
+                                <c:forEach items="${modules}" var="s">
                                     <option value="${s.moduleCode}">${s.moduleTitle}</option>
                                 </c:forEach>
                             </select>
                         </div>
-                        <div class="form-group" style="margin: 0; width: 80px;">
-                            <label class="form-label" style="font-size: 0.7rem;">Year</label>
-                            <input type="text" name="year" class="form-input" style="padding: 0.5rem 0.75rem; font-size: 0.85rem;" placeholder="Year 1" required>
-                        </div>
-                        <div class="form-group" style="margin: 0; width: 80px;">
+                        <div class="form-group" style="margin: 0; flex: 1; min-width: 140px;">
                             <label class="form-label" style="font-size: 0.7rem;">Section</label>
-                            <input type="text" name="section" class="form-input" style="padding: 0.5rem 0.75rem; font-size: 0.85rem;" placeholder="A" required>
+                            <select name="sectionId" class="form-select" required>
+                                <option value="" disabled selected>Select Section</option>
+                                <c:forEach items="${sections}" var="sec">
+                                    <option value="${sec.sectionId}">${sec.year} - ${sec.sectionName}</option>
+                                </c:forEach>
+                            </select>
                         </div>
                         <div class="form-group" style="margin: 0; width: 100px;">
                             <label class="form-label" style="font-size: 0.7rem;">Type</label>
@@ -142,7 +143,7 @@
                         <tr>
                             <th>Day</th>
                             <th>Time Range</th>
-                            <th>Subject</th>
+                            <th>Module</th>
                             <th>Section</th>
                             <th>Instructor</th>
                             <th>Room</th>
@@ -155,7 +156,7 @@
                                 <td>${e.day}</td>
                                 <td>${e.startTime} - ${e.endTime}</td>
                                 <td>${e.moduleTitle}</td>
-                                <td>${e.section}</td>
+                                <td>${e.year} - ${e.sectionName}</td>
                                 <td>${e.lecturerName}</td>
                                 <td>${e.room}</td>
                                 <td>

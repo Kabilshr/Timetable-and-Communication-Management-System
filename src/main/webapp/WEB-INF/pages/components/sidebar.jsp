@@ -52,6 +52,10 @@
                 <span class="material-symbols-outlined">person_search</span>
                 <span>Teachers</span>
             </a>
+            <a href="<%= sidePath %>/student-dashboard?view=profile" class="sidebar-link ${param.view == 'profile' ? 'active' : ''}">
+                <span class="material-symbols-outlined">person</span>
+                <span>My Profile</span>
+            </a>
         </c:if>
 
         <c:if test="${sessionScope.user.role == 'Teacher'}">

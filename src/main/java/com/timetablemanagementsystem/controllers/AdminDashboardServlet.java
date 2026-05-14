@@ -1,6 +1,7 @@
 package com.timetablemanagementsystem.controllers;
 
 import com.timetablemanagementsystem.dao.*;
+
 import com.timetablemanagementsystem.dao.ModuleDAO;
 import com.timetablemanagementsystem.model.*;
 import com.timetablemanagementsystem.model.Module;
@@ -21,6 +22,7 @@ public class AdminDashboardServlet extends HttpServlet {
     private UserDAO userDAO = new UserDAO();
     private AnnouncementDAO announcementDAO = new AnnouncementDAO();
     private ModuleDAO moduleDAO = new ModuleDAO();
+    private SectionDAO sectionDAO = new SectionDAO();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
@@ -56,15 +58,19 @@ public class AdminDashboardServlet extends HttpServlet {
                 List<TimetableEntry> timetable = timetableDAO.getTimetable();
                 List<Teacher> teachers = teacherDAO.getAllTeachers();
                 List<Module> modules = moduleDAO.getAllModules();
+                List<Section> sections = sectionDAO.getAllSections();
                 
                 request.setAttribute("timetable", timetable);
                 request.setAttribute("teachers", teachers);
-                request.setAttribute("subjects", modules);
+                request.setAttribute("modules", modules);
+                request.setAttribute("sections", sections);
                 request.getRequestDispatcher("/WEB-INF/pages/manage-schedule.jsp").forward(request, response);
             } else if ("teachers".equals(view)) {
                 List<Teacher> teachers = teacherDAO.getAllTeachers();
+                List<Module> modules = moduleDAO.getAllModules();
                 
                 request.setAttribute("teachers", teachers);
+                request.setAttribute("modules", modules);
                 request.getRequestDispatcher("/WEB-INF/pages/manage-teachers.jsp").forward(request, response);
             } else if ("announcements".equals(view)) {
                 List<Announcement> announcements = announcementDAO.getAllAnnouncements();
@@ -103,8 +109,7 @@ public class AdminDashboardServlet extends HttpServlet {
                 break;
             case "addTimetable":
                 TimetableEntry entry = new TimetableEntry();
-                entry.setYear(request.getParameter("year"));
-                entry.setSection(request.getParameter("section"));
+                entry.setSectionId(Integer.parseInt(request.getParameter("sectionId")));
                 entry.setModuleCode(request.getParameter("moduleCode"));
                 entry.setClassType(request.getParameter("classType"));
                 entry.setLecturerId(Integer.parseInt(request.getParameter("teacherId")));

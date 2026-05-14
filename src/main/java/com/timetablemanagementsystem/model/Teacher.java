@@ -3,19 +3,16 @@ package com.timetablemanagementsystem.model;
 public class Teacher {
     private int teacherId;
     private int userId;
-    private String moduleCode;
     
     // Convenience fields for display (populated via JOINs)
     private String teacherName;
     private String teacherEmail;
-    private String moduleTitle;
 
     public Teacher() {}
 
-    public Teacher(int teacherId, int userId, String moduleCode) {
+    public Teacher(int teacherId, int userId) {
         this.teacherId = teacherId;
         this.userId = userId;
-        this.moduleCode = moduleCode;
     }
 
     // Constructor for display purposes
@@ -31,15 +28,9 @@ public class Teacher {
     public int getUserId() { return userId; }
     public void setUserId(int userId) { this.userId = userId; }
 
-    public String getModuleCode() { return moduleCode; }
-    public void setModuleCode(String moduleCode) { this.moduleCode = moduleCode; }
-
     public String getTeacherName() { return teacherName; }
     public void setTeacherName(String teacherName) { this.teacherName = teacherName; }
 
     public String getTeacherEmail() { return teacherEmail; }
     public void setTeacherEmail(String teacherEmail) { this.teacherEmail = teacherEmail; }
-
-    public String getModuleTitle() { return moduleTitle; }
-    public void setModuleTitle(String moduleTitle) { this.moduleTitle = moduleTitle; }
 }

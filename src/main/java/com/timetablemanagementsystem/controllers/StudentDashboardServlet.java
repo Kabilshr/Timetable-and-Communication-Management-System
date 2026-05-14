@@ -15,6 +15,10 @@ public class StudentDashboardServlet extends HttpServlet {
     private TimetableDAO timetableDAO = new TimetableDAO();
     private AnnouncementDAO announcementDAO = new AnnouncementDAO();
     private TeacherDAO teacherDAO = new TeacherDAO();
+    private ModuleDAO moduleDAO = new ModuleDAO();
+    private StudentDAO studentDAO = new StudentDAO();
+    private SectionDAO sectionDAO = new SectionDAO();
+    private UserDAO userDAO = new UserDAO();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
@@ -26,75 +30,95 @@ public class StudentDashboardServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
         String role = user.getRole();
         if (!"Student".equalsIgnoreCase(role)) {
-            if ("Admin".equalsIgnoreCase(role)) {
-                response.sendRedirect(request.getContextPath() + "/admin-dashboard");
-            } else if ("Teacher".equalsIgnoreCase(role)) {
-                response.sendRedirect(request.getContextPath() + "/teacher-dashboard");
-            } else {
-                response.sendRedirect(request.getContextPath() + "/portal");
-            }
+            response.sendRedirect(request.getContextPath() + "/portal");
             return;
         }
 
-        String requestedDay = request.getParameter("day");
         String view = request.getParameter("view");
         if (view == null) view = "dashboard";
         request.setAttribute("view", view);
 
         try {
             if ("dashboard".equals(view)) {
-                String today = LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
-                String filterDay = (requestedDay != null) ? requestedDay : today;
-                List<TimetableEntry> timetable = timetableDAO.getTimetable();
+                Student student = studentDAO.getStudentByUserId(user.getUserId());
+                List<TimetableEntry> timetable = (student != null) ? timetableDAO.getTimetable(null, student.getSectionId(), null) : new ArrayList<>();
+                List<Announcement> announcements = announcementDAO.getAllAnnouncements();
                 
-                List<Announcement> allAnnouncements = announcementDAO.getAllAnnouncements();
-                List<Announcement> recent = allAnnouncements.size() > 3 ? allAnnouncements.subList(0, 3) : allAnnouncements;
-
                 request.setAttribute("todayClasses", timetable);
-                request.setAttribute("announcements", recent);
-                request.setAttribute("todayDay", filterDay);
+                request.setAttribute("announcements", announcements.size() > 3 ? announcements.subList(0, 3) : announcements);
+                request.setAttribute("student", student);
 
             } else if ("schedule".equals(view)) {
-                request.setAttribute("timetable", timetableDAO.getTimetable());
+                Student student = studentDAO.getStudentByUserId(user.getUserId());
+                request.setAttribute("timetable", (student != null) ? timetableDAO.getTimetable(null, student.getSectionId(), null) : new ArrayList<>());
+
+            } else if ("profile".equals(view)) {
+                request.setAttribute("student", studentDAO.getStudentByUserId(user.getUserId()));
+                request.setAttribute("sections", sectionDAO.getAllSections());
 
             } else if ("announcements".equals(view)) {
                 request.setAttribute("announcements", announcementDAO.getAllAnnouncements());
-
-            } else if ("teachers".equals(view)) {
-                String teacherIdParam = request.getParameter("teacherId");
-                List<String> days = Arrays.asList("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday");
-                List<String> allSlots = Arrays.asList("08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00");
-                
-                if (teacherIdParam != null && !teacherIdParam.isEmpty()) {
-                    int tId = Integer.parseInt(teacherIdParam);
-                    Teacher teacher = null;
-                    for(Teacher t : teacherDAO.getAllTeachers()) { if(t.getTeacherId() == tId) { teacher = t; break; } }
-                    
-                    if (teacher != null) {
-                        List<TimetableEntry> teacherSchedule = timetableDAO.getTimetable();
-                        Map<String, List<String>> freeSlotsByDay = new HashMap<>();
-                        for (String day : days) {
-                            List<String> freeSlots = new ArrayList<>(allSlots);
-                            for (TimetableEntry entry : teacherSchedule) {
-                                if (entry.getDay().equalsIgnoreCase(day) && entry.getLecturerName().equalsIgnoreCase(teacher.getTeacherName())) {
-                                    String entryTime = entry.getStartTime().toString().substring(0, 5);
-                                    freeSlots.remove(entryTime);
-                                }
-                            }
-                            freeSlotsByDay.put(day, freeSlots);
-                        }
-                        request.setAttribute("selectedTeacher", teacher);
-                        request.setAttribute("freeSlotsByDay", freeSlotsByDay);
-                    }
-                }
-                request.setAttribute("teachers", teacherDAO.getAllTeachers());
-                request.setAttribute("days", days);
             }
             
             request.getRequestDispatcher("/WEB-INF/pages/student-dashboard.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
             throw new ServletException(e);
+        }
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("login");
+            return;
+        }
+
+        User user = (User) session.getAttribute("user");
+        String action = request.getParameter("action");
+
+        if ("updateProfile".equals(action)) {
+            System.out.println("DEBUG: Profile update request received for user ID: " + user.getUserId());
+            try {
+                String name = request.getParameter("name");
+                String email = request.getParameter("email");
+                String sectionIdStr = request.getParameter("sectionId");
+
+                System.out.println("DEBUG: Received parameters - Name: " + name + ", Email: " + email + ", SectionID: " + sectionIdStr);
+
+                if (name == null || name.trim().isEmpty() || email == null || email.trim().isEmpty() || sectionIdStr == null) {
+                    System.out.println("DEBUG: Validation failed - Missing fields");
+                    response.sendRedirect("student-dashboard?view=profile&error=true&msg=MissingFields");
+                    return;
+                }
+
+                int sectionId = Integer.parseInt(sectionIdStr);
+
+                // Update user object (name and email)
+                user.setName(name.trim());
+                user.setEmail(email.trim());
+
+                System.out.println("DEBUG: Attempting to update User table...");
+                boolean userUpdated = userDAO.updateProfile(user);
+                System.out.println("DEBUG: User table update result: " + userUpdated);
+
+                System.out.println("DEBUG: Attempting to update Student table (section)...");
+                boolean studentUpdated = studentDAO.updateStudentSection(user.getUserId(), sectionId);
+                System.out.println("DEBUG: Student table update result: " + studentUpdated);
+
+                if (userUpdated && studentUpdated) {
+                    System.out.println("DEBUG: Both updates successful. Synchronizing session...");
+                    session.setAttribute("user", user);
+                    response.sendRedirect("student-dashboard?view=profile&success=true");
+                } else {
+                    System.err.println("DEBUG ERROR: Profile Update Partial/Full Failure. User=" + userUpdated + ", Student=" + studentUpdated);
+                    response.sendRedirect("student-dashboard?view=profile&error=true");
+                }
+            } catch (Exception e) {
+                System.err.println("DEBUG CRITICAL ERROR in StudentDashboardServlet.doPost: " + e.getMessage());
+                e.printStackTrace();
+                response.sendRedirect("student-dashboard?view=profile&error=true");
+            }
         }
     }
 }

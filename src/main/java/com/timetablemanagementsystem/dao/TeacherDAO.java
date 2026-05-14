@@ -8,11 +8,10 @@ import java.util.List;
 
 public class TeacherDAO {
     public int addTeacher(Teacher teacher) {
-        String query = "INSERT INTO teachers (user_id, module_code) VALUES (?, ?)";
+        String query = "INSERT INTO teachers (user_id) VALUES (?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, teacher.getUserId());
-            stmt.setString(2, teacher.getModuleCode());
             int affectedRows = stmt.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -27,10 +26,9 @@ public class TeacherDAO {
 
     public List<Teacher> getAllTeachers() {
         List<Teacher> teachers = new ArrayList<>();
-        String query = "SELECT t.*, u.name as teacher_name, u.email as teacher_email, m.module_title " +
+        String query = "SELECT t.*, u.name as teacher_name, u.email as teacher_email " +
                        "FROM teachers t " +
-                       "JOIN users u ON t.user_id = u.user_id " +
-                       "LEFT JOIN modules m ON t.module_code = m.module_code";
+                       "JOIN users u ON t.user_id = u.user_id";
         try (Connection conn = DBConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
@@ -38,10 +36,8 @@ public class TeacherDAO {
                 Teacher t = new Teacher();
                 t.setTeacherId(rs.getInt("teacher_id"));
                 t.setUserId(rs.getInt("user_id"));
-                t.setModuleCode(rs.getString("module_code"));
                 t.setTeacherName(rs.getString("teacher_name"));
                 t.setTeacherEmail(rs.getString("teacher_email"));
-                t.setModuleTitle(rs.getString("module_title"));
                 teachers.add(t);
             }
         } catch (SQLException e) {
@@ -51,10 +47,9 @@ public class TeacherDAO {
     }
 
     public Teacher getTeacherByName(String name) {
-        String query = "SELECT t.*, u.name as teacher_name, u.email as teacher_email, m.module_title " +
+        String query = "SELECT t.*, u.name as teacher_name, u.email as teacher_email " +
                        "FROM teachers t " +
                        "JOIN users u ON t.user_id = u.user_id " +
-                       "LEFT JOIN modules m ON t.module_code = m.module_code " +
                        "WHERE u.name = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -64,10 +59,8 @@ public class TeacherDAO {
                 Teacher t = new Teacher();
                 t.setTeacherId(rs.getInt("teacher_id"));
                 t.setUserId(rs.getInt("user_id"));
-                t.setModuleCode(rs.getString("module_code"));
                 t.setTeacherName(rs.getString("teacher_name"));
                 t.setTeacherEmail(rs.getString("teacher_email"));
-                t.setModuleTitle(rs.getString("module_title"));
                 return t;
             }
         } catch (SQLException e) {
@@ -77,10 +70,9 @@ public class TeacherDAO {
     }
 
     public Teacher getTeacherByUserId(int userId) {
-        String query = "SELECT t.*, u.name as teacher_name, u.email as teacher_email, m.module_title " +
+        String query = "SELECT t.*, u.name as teacher_name, u.email as teacher_email " +
                        "FROM teachers t " +
                        "JOIN users u ON t.user_id = u.user_id " +
-                       "LEFT JOIN modules m ON t.module_code = m.module_code " +
                        "WHERE t.user_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -90,10 +82,8 @@ public class TeacherDAO {
                 Teacher t = new Teacher();
                 t.setTeacherId(rs.getInt("teacher_id"));
                 t.setUserId(rs.getInt("user_id"));
-                t.setModuleCode(rs.getString("module_code"));
                 t.setTeacherName(rs.getString("teacher_name"));
                 t.setTeacherEmail(rs.getString("teacher_email"));
-                t.setModuleTitle(rs.getString("module_title"));
                 return t;
             }
         } catch (SQLException e) {
@@ -103,10 +93,9 @@ public class TeacherDAO {
     }
 
     public Teacher getTeacherById(int id) {
-        String query = "SELECT t.*, u.name as teacher_name, u.email as teacher_email, m.module_title " +
+        String query = "SELECT t.*, u.name as teacher_name, u.email as teacher_email " +
                        "FROM teachers t " +
                        "JOIN users u ON t.user_id = u.user_id " +
-                       "LEFT JOIN modules m ON t.module_code = m.module_code " +
                        "WHERE t.teacher_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -116,10 +105,8 @@ public class TeacherDAO {
                 Teacher t = new Teacher();
                 t.setTeacherId(rs.getInt("teacher_id"));
                 t.setUserId(rs.getInt("user_id"));
-                t.setModuleCode(rs.getString("module_code"));
                 t.setTeacherName(rs.getString("teacher_name"));
                 t.setTeacherEmail(rs.getString("teacher_email"));
-                t.setModuleTitle(rs.getString("module_title"));
                 return t;
             }
         } catch (SQLException e) {

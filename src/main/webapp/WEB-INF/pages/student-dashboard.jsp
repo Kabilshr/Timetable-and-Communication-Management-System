@@ -131,12 +131,12 @@
 
                 <c:when test="${view == 'compare'}">
                     <div class="admin-section">
-                        <h1>Compare Subject Schedules</h1>
+                        <h1>Compare Module Schedules</h1>
                         <form action="student-dashboard" method="GET" style="margin: 1.5rem 0; display: flex; flex-wrap: wrap; gap: 1rem;">
                             <input type="hidden" name="view" value="compare">
-                            <c:forEach items="${subjects}" var="s">
+                            <c:forEach items="${modules}" var="s">
                                 <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; background: #f8fafc; padding: 0.5rem 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; cursor: pointer;">
-                                    <input type="checkbox" name="subjects" value="${s.moduleCode}" <c:forEach items="${selectedSubjects}" var="sel"><c:if test="${sel == s.moduleCode}">checked</c:if></c:forEach>>
+                                    <input type="checkbox" name="modules" value="${s.moduleCode}" <c:forEach items="${selectedModules}" var="sel"><c:if test="${sel == s.moduleCode}">checked</c:if></c:forEach>>
                                     ${s.moduleTitle}
                                 </label>
                             </c:forEach>
@@ -165,6 +165,82 @@
                             </c:forEach>
                         </div>
                     </div>
+                </c:when>
+
+                <c:when test="${view == 'profile'}">
+                    <div class="admin-section" style="max-width: 600px;">
+                        <div class="section-header">
+                            <h1>My Profile</h1>
+                            <p class="text-secondary">Update your personal information and section</p>
+                        </div>
+
+                        <c:if test="${param.success == 'true'}">
+                            <div class="alert alert-success" style="padding: 1rem; background: #dcfce7; color: #166534; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+                                Profile updated successfully!
+                            </div>
+                        </c:if>
+                        <c:if test="${param.error == 'true'}">
+                            <div class="alert alert-danger" style="padding: 1rem; background: #fee2e2; color: #991b1b; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+                                Error updating profile. Please ensure inputs are valid.
+                            </div>
+                        </c:if>
+
+                        <form id="profileForm" action="student-dashboard" method="POST" class="add-form" style="background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                            <input type="hidden" name="action" value="updateProfile">
+                            
+                            <div class="form-group">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" id="profileName" name="name" class="form-input" value="${sessionScope.user.name}" required readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" id="profileEmail" name="email" class="form-input" value="${sessionScope.user.email}" required disabled>
+                                <small class="text-secondary" style="font-size: 0.75rem;">Email address cannot be changed.</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Current Section</label>
+                                <select name="sectionId" class="form-select" required>
+                                    <option value="" disabled ${student.sectionId == null ? 'selected' : ''}>Select your section</option>
+                                    <c:forEach items="${sections}" var="sec">
+                                        <option value="${sec.sectionId}" ${student.sectionId == sec.sectionId ? 'selected' : ''}>
+                                            ${sec.year} - ${sec.sectionName}
+                                        </option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+
+                            <div class="form-group" style="margin-top: 2rem; display: flex; gap: 1rem;">
+                                <button type="button" id="editBtn" class="btn-secondary" style="flex: 1; padding: 1rem;" onclick="enableEditing()">Edit Profile</button>
+                                <button type="submit" id="saveBtn" class="btn-primary" style="flex: 1; padding: 1rem; display: none;">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <script>
+                    function enableEditing() {
+                        document.getElementById('profileName').readOnly = false;
+                        document.getElementById('profileName').focus();
+                        
+                        document.getElementById('editBtn').style.display = 'none';
+                        document.getElementById('saveBtn').style.display = 'block';
+                    }
+
+                    document.getElementById('profileForm').onsubmit = function() {
+                        const name = document.getElementById('profileName').value.trim();
+                        // Email is disabled, browser will send current value but it's not editable. 
+                        // To ensure it is sent, we can temporarily re-enable if needed or just use hidden input.
+                        // For now, let's remove disabled and add readonly to email to ensure it's submitted.
+                        document.getElementById('profileEmail').disabled = false;
+                        
+                        if (name === "") {
+                            alert("Name cannot be empty");
+                            return false;
+                        }
+                        return true;
+                    };
+                    </script>
                 </c:when>
 
                 <c:when test="${view == 'announcements'}">

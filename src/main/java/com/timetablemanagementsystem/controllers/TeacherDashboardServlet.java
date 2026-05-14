@@ -47,7 +47,7 @@ public class TeacherDashboardServlet extends HttpServlet {
         try {
             if ("dashboard".equals(view)) {
                 // Fetch personal schedule
-                List<TimetableEntry> timetable = timetableDAO.getTimetable(null, null, user.getName());
+                List<TimetableEntry> timetable = timetableDAO.getTimetable(null, -1, user.getName());
                 
                 // Get today's classes
                 String today = LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
@@ -67,7 +67,7 @@ public class TeacherDashboardServlet extends HttpServlet {
                 request.setAttribute("todayDay", today);
 
             } else if ("schedule".equals(view)) {
-                request.setAttribute("timetable", timetableDAO.getTimetable(null, null, user.getName()));
+                request.setAttribute("timetable", timetableDAO.getTimetable(null, -1, user.getName()));
 
             } else if ("announcements".equals(view)) {
                 request.setAttribute("announcements", announcementDAO.getAllAnnouncements());
@@ -77,12 +77,12 @@ public class TeacherDashboardServlet extends HttpServlet {
                 List<TimetableEntry> combinedTimetable = new ArrayList<>();
                 
                 // Always include current teacher
-                combinedTimetable.addAll(timetableDAO.getTimetable(null, null, user.getName()));
+                combinedTimetable.addAll(timetableDAO.getTimetable(null, -1, user.getName()));
 
                 if (selectedTeachers != null) {
                     for (String teacherName : selectedTeachers) {
                         if (!teacherName.equalsIgnoreCase(user.getName())) {
-                            combinedTimetable.addAll(timetableDAO.getTimetable(null, null, teacherName));
+                            combinedTimetable.addAll(timetableDAO.getTimetable(null, -1, teacherName));
                         }
                     }
                 }

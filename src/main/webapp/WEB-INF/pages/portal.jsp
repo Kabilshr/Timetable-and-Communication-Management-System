@@ -51,7 +51,7 @@
                         <tr>
                             <th>Day</th>
                             <th>Time</th>
-                            <th>Subject</th>
+                            <th>Module</th>
                             <th>Teacher</th>
                             <th>Room</th>
                         </tr>

@@ -6,8 +6,7 @@ public class TimetableEntry {
     private int entryId;
     private String moduleCode;
     private int lecturerId;
-    private String year;
-    private String section;
+    private int sectionId;
     private String classType;
     private String day;
     private Time startTime;
@@ -18,6 +17,8 @@ public class TimetableEntry {
     // Convenience fields for display (populated via JOINs)
     private String moduleTitle;
     private String lecturerName;
+    private String year;
+    private String sectionName;
 
     public TimetableEntry() {}
 
@@ -30,11 +31,8 @@ public class TimetableEntry {
     public int getLecturerId() { return lecturerId; }
     public void setLecturerId(int lecturerId) { this.lecturerId = lecturerId; }
 
-    public String getYear() { return year; }
-    public void setYear(String year) { this.year = year; }
-
-    public String getSection() { return section; }
-    public void setSection(String section) { this.section = section; }
+    public int getSectionId() { return sectionId; }
+    public void setSectionId(int sectionId) { this.sectionId = sectionId; }
 
     public String getClassType() { return classType; }
     public void setClassType(String classType) { this.classType = classType; }
@@ -59,4 +57,10 @@ public class TimetableEntry {
 
     public String getLecturerName() { return lecturerName; }
     public void setLecturerName(String lecturerName) { this.lecturerName = lecturerName; }
+
+    public String getYear() { return year; }
+    public void setYear(String year) { this.year = year; }
+
+    public String getSectionName() { return sectionName; }
+    public void setSectionName(String sectionName) { this.sectionName = sectionName; }
 }

@@ -2,7 +2,6 @@ package com.timetablemanagementsystem.controllers;
 
 import com.google.gson.*;
 import com.timetablemanagementsystem.dao.*;
-import com.timetablemanagementsystem.dao.ModuleDAO;
 import com.timetablemanagementsystem.model.*;
 import com.timetablemanagementsystem.model.Module; // Avoid ambiguity
 import jakarta.servlet.ServletException;
@@ -20,6 +19,7 @@ public class ScheduleUploadServlet extends HttpServlet {
     private ModuleDAO moduleDAO = new ModuleDAO();
     private TeacherDAO teacherDAO = new TeacherDAO();
     private UserDAO userDAO = new UserDAO();
+    private SectionDAO sectionDAO = new SectionDAO();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.sendRedirect("admin-dashboard?view=schedule");
@@ -64,8 +64,8 @@ public class ScheduleUploadServlet extends HttpServlet {
 
                 try {
                     // 1. Extract Data
-                    String year = getAsString(obj, "year");
-                    String section = getAsString(obj, "section");
+                    String yearStr = getAsString(obj, "year");
+                    String sectionStr = getAsString(obj, "section");
                     String day = getAsString(obj, "day");
                     String startTimeStr = getAsString(obj, "start_time");
                     String endTimeStr = getAsString(obj, "end_time");
@@ -76,7 +76,7 @@ public class ScheduleUploadServlet extends HttpServlet {
                     String block = getAsString(obj, "block");
                     String room = getAsString(obj, "room");
 
-                    if (year == null || section == null || day == null || startTimeStr == null || moduleCode == null || lecturerName == null) {
+                    if (yearStr == null || sectionStr == null || day == null || startTimeStr == null || moduleCode == null || lecturerName == null) {
                         throw new Exception("Missing mandatory fields.");
                     }
 
@@ -90,12 +90,8 @@ public class ScheduleUploadServlet extends HttpServlet {
                     // 3. Resolve Teacher
                     Teacher teacher = teacherDAO.getTeacherByName(lecturerName);
                     if (teacher == null) {
-                        // Check if a User exists with this name. If not, we might need a placeholder user.
-                        // In a real system, lecturers should be pre-registered.
-                        // For this implementation, we search for a user or log an error.
                         User user = userDAO.getUserByName(lecturerName);
                         if (user == null) {
-                            // Create a placeholder teacher user if not exists
                             user = new User();
                             user.setName(lecturerName);
                             user.setEmail(lecturerName.toLowerCase().replace(" ", ".") + "@placeholder.com");
@@ -104,22 +100,24 @@ public class ScheduleUploadServlet extends HttpServlet {
                             userDAO.register(user);
                             user = userDAO.getUserByName(lecturerName);
                         }
-                        
-                        // Now check if they are in the teachers table
                         teacher = teacherDAO.getTeacherByUserId(user.getUserId());
                         if (teacher == null) {
                             teacher = new Teacher();
                             teacher.setUserId(user.getUserId());
-                            teacher.setModuleCode(moduleCode);
                             int tId = teacherDAO.addTeacher(teacher);
                             teacher = teacherDAO.getTeacherById(tId);
                         }
                     }
 
-                    // 4. Create Entry
+                    // 4. Resolve Section
+                    Section section = sectionDAO.getSectionByYearAndName(yearStr, sectionStr);
+                    if (section == null) {
+                        throw new Exception("Section not found: " + yearStr + " - " + sectionStr);
+                    }
+
+                    // 5. Create Entry
                     TimetableEntry entry = new TimetableEntry();
-                    entry.setYear(year);
-                    entry.setSection(section);
+                    entry.setSectionId(section.getSectionId());
                     entry.setDay(day);
                     entry.setStartTime(parseTime(startTimeStr));
                     entry.setEndTime(parseTime(endTimeStr));
