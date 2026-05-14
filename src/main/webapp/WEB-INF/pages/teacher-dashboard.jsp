@@ -99,7 +99,6 @@
                 <c:when test="${view == 'schedule'}">
                     <div class="admin-section">
                         <h1>Personal Teaching Timetable</h1>
-                                <link rel="stylesheet" href="<%=request.getContextPath()%>/css/calendar.css">
                                 <div class="timetable-container">
                                     <div class="timetable-scroll">
                                         <div class="timetable-wrapper">
@@ -121,11 +120,34 @@
                                                                 <c:set var="startMinutes" value="${(e.startTime.hours * 60) + e.startTime.minutes}" />
                                                                 <c:set var="endMinutes" value="${(e.endTime.hours * 60) + e.endTime.minutes}" />
                                                                 
+                                                                <%-- Overlap Detection --%>
+                                                                <c:set var="overlapCount" value="0" />
+                                                                <c:set var="colIndex" value="0" />
+                                                                <c:forEach items="${timetable}" var="e2">
+                                                                    <c:if test="${e2.day == day && e2.entryId != e.entryId}">
+                                                                        <c:set var="s2" value="${(e2.startTime.hours * 60) + e2.startTime.minutes}" />
+                                                                        <c:set var="n2" value="${(e2.endTime.hours * 60) + e2.endTime.minutes}" />
+                                                                        <c:if test="${s2 < endMinutes && n2 > startMinutes}">
+                                                                            <c:set var="overlapCount" value="${overlapCount + 1}" />
+                                                                            <c:if test="${e2.entryId < e.entryId}">
+                                                                                <c:set var="colIndex" value="${colIndex + 1}" />
+                                                                            </c:if>
+                                                                        </c:if>
+                                                                    </c:if>
+                                                                </c:forEach>
+                                                                
+                                                                <c:set var="width" value="${100 / (overlapCount + 1)}" />
+                                                                <c:set var="left" value="${colIndex * width}" />
+                                                                
                                                                 <c:set var="minutesFromStart" value="${startMinutes - 360}" />
                                                                 <c:set var="top" value="${(minutesFromStart * 2) + 56}" />
                                                                 <c:set var="height" value="${(endMinutes - startMinutes) * 2}" />
                                                                 
-                                                                <div class="class-block" style="top: ${top}px; height: ${height}px;">
+                                                                <%-- Step 5: Debug logs for positioning --%>
+                                                                <% System.out.println("DEBUG: Class " + ((com.timetablemanagementsystem.model.TimetableEntry)pageContext.getAttribute("e")).getModuleCode() + 
+                                                                    ", top=" + pageContext.getAttribute("top") + "px, height=" + pageContext.getAttribute("height") + "px, left=" + pageContext.getAttribute("left") + "%, width=" + pageContext.getAttribute("width") + "%"); %>
+                                                                
+                                                                <div class="class-block" style="top: ${top}px; height: ${height}px; left: ${left}%; width: calc(${width}% - 4px); margin-left: 2px;">
                                                                     <div class="block-module">${e.moduleCode}</div>
                                                                     <div class="block-lecturer">${e.lecturerName}</div>
                                                                     <div class="block-time">
@@ -173,13 +195,6 @@
                     <div class="admin-section">
                         <h1>Teacher Collaboration</h1>
                         <div style="margin: 1.5rem 0;">
-                            <!-- DEBUG OUTPUT -->
-                            <div style="background: #fff3cd; padding: 10px; margin-bottom: 10px;">
-                                Count: ${fn:length(combinedTimetable)}<br>
-                                <c:forEach var="e" items="${combinedTimetable}">
-                                    ${e.moduleCode} | ${e.day} | ${e.startTime}<br>
-                                </c:forEach>
-                            </div>
                             <form action="teacher-dashboard" method="GET" style="display: flex; flex-wrap: wrap; gap: 1rem;">
                                 <input type="hidden" name="view" value="collaboration">
                                 <c:forEach items="${allTeachers}" var="t">
@@ -195,16 +210,16 @@
                         </div>
                         <div class="calendar-grid" style="grid-template-columns: 100px repeat(6, 1fr);">
                             <div class="calendar-header" style="background: transparent;"></div>
-                            <div class="calendar-header">Sun</div><div class="calendar-header">Mon</div><div class="calendar-header">Tue</div><div class="calendar-header">Wed</div><div class="calendar-header">Thu</div><div class="calendar-header">Fri</div>
-                            <c:set var="days" value="${fn:split('Sunday,Monday,Tuesday,Wednesday,Thursday,Friday', ',')}" />
+                            <div class="calendar-header">SUN</div><div class="calendar-header">MON</div><div class="calendar-header">TUE</div><div class="calendar-header">WED</div><div class="calendar-header">THU</div><div class="calendar-header">FRI</div>
+                            <c:set var="days" value="${fn:split('SUN,MON,TUE,WED,THU,FRI', ',')}" />
                             <c:set var="times" value="${fn:split('08:00,09:00,10:00,11:00,12:00,13:00,14:00,15:00,16:00,17:00', ',')}" />
                             <c:forEach items="${times}" var="time">
                                 <div class="time-label">${time}</div>
                                 <c:forEach items="${days}" var="day">
-                                    <c:set var="count" value="0" /><c:forEach items="${combinedTimetable}" var="e"><c:if test="${e.day == day && fn:substring(e.startTime, 0, 5) == time}"><c:set var="count" value="${count + 1}" /></c:if></c:forEach>
+                                    <c:set var="count" value="0" /><c:forEach items="${combinedEntries}" var="e"><c:if test="${e.day == day && fn:substring(e.startTime, 0, 5) == time}"><c:set var="count" value="${count + 1}" /></c:if></c:forEach>
                                     <div class="calendar-cell ${count > 1 ? 'overlap-alert' : ''}" style="min-height: 120px;">
                                         <c:if test="${count > 1}"><div class="overlap-badge">OVERLAP</div></c:if>
-                                        <c:forEach items="${combinedTimetable}" var="e">
+                                        <c:forEach items="${combinedEntries}" var="e">
                                             <c:if test="${e.day == day && fn:substring(e.startTime, 0, 5) == time}">
                                                 <div class="event-card ${e.lecturerId == teacherId ? 'my-event' : 'compare-event'}"><strong>${e.moduleTitle}</strong><br><small>${e.lecturerName}</small></div>
                                             </c:if>

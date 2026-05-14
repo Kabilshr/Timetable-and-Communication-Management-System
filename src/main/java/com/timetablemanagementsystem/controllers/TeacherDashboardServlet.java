@@ -59,13 +59,18 @@ public class TeacherDashboardServlet extends HttpServlet {
             if ("dashboard".equals(view)) {
                 // Fetch personal schedule
                 List<TimetableEntry> timetable = timetableDAO.getTimetable(teacherId, -1, null); 
-                System.out.println("DEBUG: Timetable size: " + timetable.size());
+                normalizeDays(timetable);
+                timetable = mergeEntries(timetable);
+                System.out.println("DEBUG: Timetable size after merging: " + timetable.size());
                 
                 // Get today's classes
-                String today = LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+                String todayFull = LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH).toUpperCase();
+                String todayShort = todayFull.substring(0, 3);
+                
                 List<TimetableEntry> todayClasses = new ArrayList<>();
                 for (TimetableEntry entry : timetable) {
-                    if (today.equalsIgnoreCase(entry.getDay())) {
+                    String entryDay = entry.getDay().toUpperCase();
+                    if (entryDay.equals(todayFull) || entryDay.equals(todayShort)) {
                         todayClasses.add(entry);
                     }
                 }
@@ -77,11 +82,14 @@ public class TeacherDashboardServlet extends HttpServlet {
 
                 request.setAttribute("todayClasses", todayClasses);
                 request.setAttribute("announcements", recent);
-                request.setAttribute("todayDay", today);
+                request.setAttribute("todayDay", todayFull);
 
             } else if ("schedule".equals(view)) {
                 List<TimetableEntry> timetable = timetableDAO.getTimetable(teacherId, -1, null);
-                System.out.println("DEBUG: Schedule view, teacher_id=" + teacherId + ", timetable size: " + timetable.size());
+                normalizeDays(timetable);
+                timetable = mergeEntries(timetable);
+                System.out.println("DEBUG: Schedule view, teacher_id=" + teacherId + ", merged size: " + timetable.size());
+                
                 request.setAttribute("timetable", timetable);
 
             } else if ("announcements".equals(view)) {
@@ -94,12 +102,12 @@ public class TeacherDashboardServlet extends HttpServlet {
                 System.out.println("DEBUG: Logged in teacher_id = " + teacherId);
                 System.out.println("DEBUG: Selected teacher_ids = " + (selectedTeacherIds != null ? Arrays.toString(selectedTeacherIds) : "none"));
                 
-                List<TimetableEntry> combinedTimetable = new ArrayList<>();
+                List<TimetableEntry> combinedEntries = new ArrayList<>();
                 
                 // Fetch current teacher
                 List<TimetableEntry> currentTeacherEntries = timetableDAO.getTimetable(teacherId, -1, null);
-                combinedTimetable.addAll(currentTeacherEntries);
-                System.out.println("DEBUG: Current teacher entries = " + currentTeacherEntries.size());
+                normalizeDays(currentTeacherEntries);
+                combinedEntries.addAll(currentTeacherEntries);
 
                 if (selectedTeacherIds != null) {
                     for (String tIdStr : selectedTeacherIds) {
@@ -107,8 +115,8 @@ public class TeacherDashboardServlet extends HttpServlet {
                             int tId = Integer.parseInt(tIdStr);
                             if (tId != teacherId) {
                                 List<TimetableEntry> selectedTeacherEntries = timetableDAO.getTimetable(tId, -1, null);
-                                combinedTimetable.addAll(selectedTeacherEntries);
-                                System.out.println("DEBUG: Selected teacher_id " + tId + " entries = " + selectedTeacherEntries.size());
+                                normalizeDays(selectedTeacherEntries);
+                                combinedEntries.addAll(selectedTeacherEntries);
                             }
                         } catch (NumberFormatException e) {
                             System.err.println("DEBUG: Invalid teacher ID: " + tIdStr);
@@ -116,10 +124,11 @@ public class TeacherDashboardServlet extends HttpServlet {
                     }
                 }
                 
-                System.out.println("DEBUG: Combined entries = " + combinedTimetable.size());
+                combinedEntries = mergeEntries(combinedEntries);
+                System.out.println("DEBUG: Combined and merged entries size = " + combinedEntries.size());
 
                 request.setAttribute("allTeachers", teacherDAO.getAllTeachers());
-                request.setAttribute("combinedTimetable", combinedTimetable);
+                request.setAttribute("combinedEntries", combinedEntries);
                 request.setAttribute("selectedTeachers", selectedTeacherIds != null ? Arrays.asList(selectedTeacherIds) : new ArrayList<>());
                 request.setAttribute("currentUser", user.getName());
                 request.setAttribute("teacherId", teacherId);
@@ -133,6 +142,60 @@ public class TeacherDashboardServlet extends HttpServlet {
             e.printStackTrace();
             throw new ServletException(e);
         }
+    }
+
+    private List<TimetableEntry> mergeEntries(List<TimetableEntry> entries) {
+        if (entries == null || entries.isEmpty()) return entries;
+        
+        Map<String, TimetableEntry> mergedMap = new LinkedHashMap<>();
+        int mergedCount = 0;
+
+        for (TimetableEntry e : entries) {
+            // Grouping key: lecturerId, moduleCode, day, startTime, endTime
+            String key = e.getLecturerId() + "-" + e.getModuleCode() + "-" + e.getDay() + "-" + e.getStartTime() + "-" + e.getEndTime();
+            
+            if (mergedMap.containsKey(key)) {
+                TimetableEntry existing = mergedMap.get(key);
+                // Append room if it's different
+                if (e.getRoom() != null && !existing.getRoom().contains(e.getRoom())) {
+                    existing.setRoom(existing.getRoom() + ", " + e.getRoom());
+                }
+                mergedCount++;
+            } else {
+                mergedMap.put(key, e);
+            }
+        }
+        
+        if (mergedCount > 0) {
+            System.out.println("DEBUG: Merged " + mergedCount + " duplicate entries.");
+        }
+        
+        return new ArrayList<>(mergedMap.values());
+    }
+
+    private void normalizeDays(List<TimetableEntry> timetable) {
+        if (timetable == null) return;
+        Map<String, String> dayMap = new HashMap<>();
+        dayMap.put("MONDAY", "MON"); dayMap.put("TUESDAY", "TUE"); dayMap.put("WEDNESDAY", "WED");
+        dayMap.put("THURSDAY", "THU"); dayMap.put("FRIDAY", "FRI"); dayMap.put("SATURDAY", "SAT");
+        dayMap.put("SUNDAY", "SUN");
+        
+        Set<String> foundDays = new HashSet<>();
+        for (TimetableEntry e : timetable) {
+            String rawDay = e.getDay();
+            if (rawDay != null) {
+                String upper = rawDay.toUpperCase();
+                foundDays.add(upper);
+                if (dayMap.containsKey(upper)) {
+                    e.setDay(dayMap.get(upper));
+                } else if (upper.length() > 3) {
+                    e.setDay(upper.substring(0, 3));
+                } else {
+                    e.setDay(upper);
+                }
+            }
+        }
+        System.out.println("DEBUG: Normalized days. Original raw days found: " + foundDays);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

@@ -839,20 +839,19 @@ main {
 
 .class-block {
     position: absolute;
-    left: 6px;
-    right: 6px;
     pointer-events: auto;
     z-index: 10;
-    padding: 10px 12px;
+    padding: 8px 10px;
     background: #0f5cc0;
     color: white;
-    border-radius: 14px;
-    box-shadow: 0 2px 6px rgba(15,92,192,0.15);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(15,92,192,0.2);
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     gap: 2px;
     overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
 .my-event {
@@ -864,6 +863,11 @@ main {
     background: #2e7d32 !important;
     color: white;
 }
+
+.block-module { font-weight: 700; font-size: 0.85rem; }
+.block-lecturer { font-weight: 500; opacity: 0.85; font-size: 0.75rem; }
+.block-time { opacity: 0.7; font-size: 0.7rem; margin-top: 2px; }
+.block-room { font-size: 0.7rem; font-weight: 600; opacity: 0.8; }
 
 @media (max-width: 768px) {
     .class-block { padding: 6px; }
