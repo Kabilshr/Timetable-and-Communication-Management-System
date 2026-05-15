@@ -8,7 +8,7 @@
     <title>Class Sync | Timetable Management</title>
     
     <!-- CSS Path Fix using Context Path -->
-    <link rel="stylesheet" type="text/css" href="<%= path %>/css/style.css">
+    <link rel="stylesheet" type="text/css" href="<%= path %>/css/style.css?v=1.3">
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">

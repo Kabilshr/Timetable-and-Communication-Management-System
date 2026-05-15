@@ -81,6 +81,7 @@ h1, h2, h3, .logo {
 
 .main {
     padding-top: 100px;
+    display: block; /* Override global main flex display */
 }
 
 /* --- HERO --- */
@@ -242,77 +243,6 @@ h1, h2, h3, .logo {
 
 .highlight h3, .highlight p {
     color: white;
-}
-
-/* --- RESPONSIVE MEDIA QUERIES --- */
-
-@media (max-width: 1024px) {
-    .feature-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    .navbar {
-        background: #fff;
-    }
-
-    .hamburger {
-        display: block;
-    }
-
-    .nav-actions {
-        display: none;
-        flex-direction: column;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        background: white;
-        padding: 20px;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        gap: 15px;
-        text-align: center;
-    }
-
-    .nav-actions.active {
-        display: flex;
-    }
-
-    .hero {
-        padding: 40px 20px;
-        text-align: center;
-    }
-
-    .hero-text {
-        max-width: 100%;
-    }
-
-    .hero-buttons {
-        justify-content: center;
-    }
-
-    .hero-image {
-        margin-top: 30px;
-    }
-
-    .features {
-        padding: 60px 20px;
-    }
-
-    .feature-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 480px) {
-    .hero-text h1 {
-        font-size: 2rem;
-    }
-    
-    .btn-primary, .btn-secondary {
-        width: 100%;
-    }
 }
 
 /* --- FOOTER --- */
@@ -520,6 +450,7 @@ main {
     padding: 2rem;
     background: var(--background);
     overflow: hidden;
+    flex-wrap: wrap;
 }
 
 /* Background shapes */
@@ -1222,6 +1153,100 @@ main {
 
     .admin-topbar {
         padding: 0 16px;
+    }
+}
+
+/* --- LANDING PAGE RESPONSIVE OVERRIDES --- */
+
+@media (max-width: 1024px) {
+    .feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        background: #fff;
+    }
+
+    .hamburger {
+        display: block;
+    }
+
+    .nav-actions {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: white;
+        padding: 2rem;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        gap: 1.5rem;
+        text-align: center;
+        z-index: 1001;
+        border-top: 1px solid var(--background);
+    }
+
+    .nav-actions.active {
+        display: flex;
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero {
+        padding: 40px 20px;
+        text-align: center;
+        flex-direction: column;
+    }
+
+    .hero-text {
+        max-width: 100%;
+        min-width: unset;
+    }
+
+    .hero-buttons {
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .hero-buttons .btn-primary,
+    .hero-buttons .btn-secondary {
+        margin-right: 0;
+    }
+
+    .hero-image {
+        margin-top: 30px;
+        justify-content: center;
+    }
+
+    .features {
+        padding: 60px 20px;
+    }
+
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-text h1 {
+        font-size: 2.2rem;
+    }
+    
+    .btn-primary, .btn-secondary {
+        width: 100%;
+        margin-right: 0;
+    }
+    
+    .hero-buttons {
+        flex-direction: column;
+        width: 100%;
     }
 }
 
