@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class Sync | Timetable Management</title>
+    <title>Class Sync | Academic Timetable Manager</title>
     
     <!-- CSS Path Fix using Context Path -->
     <link rel="stylesheet" type="text/css" href="<%= path %>/css/style.css?v=1.3">
@@ -46,40 +46,39 @@
 
 <section class="hero">
     <div class="hero-text">
-        <span class="badge">Smart Scheduling</span>
+        <span class="badge">Smart Academic Planning</span>
         <h1>
-            Simplify Academic <br>
-            <span class="primary">Timetables</span>
+            Manage Your Classes <br>
+            <span class="primary">Effortlessly</span>
         </h1>
         <p>
-            Class Sync helps institutions manage schedules efficiently with real-time updates, 
-            clean dashboards, and role-based access for students, teachers, and administrators.
+            Class Sync streamlines academic scheduling for students, teachers, and administrators.
+            Keep your timetable updated in real time, avoid conflicts, and stay organized with intuitive dashboards.
         </p>
         <div class="hero-buttons">
-            <button class="btn-primary large" onclick="location.href='register'">Explore Platform</button>
-            <button class="btn-secondary large">View Demo</button>
+            <button class="btn-primary large" onclick="location.href='register'">Get Started</button>
         </div>
     </div>
     <div class="hero-image">
         <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBR8FUEFefU29UtsMzlapat5tbymOEcZPiWrmjBZYEa_oGPyNxEwXgfepize7mBi-rhetMBEEWABlbXJ2bs_Ddi0zBaRWsXSK3lBKtwzTzagmwFQglQK2cGndvcHk1Apc7-YrJJmY7cHdYi9kNSr4vdZkkmoPjR0S7ExTR6QgQKiaJPlQZbirkqO650MPIuzCQiZpttpRxyHDvNq6KknPA9EW2B44KO6IlKOvGY-vwuONnPoYgFw3eaeqw7pMZnkAy1gNPFHhGzTnPP" 
-             alt="dashboard preview">
+             alt="Class Sync Dashboard Preview">
     </div>
 </section>
 
 <section class="features">
-    <h2>Key Features</h2>
+    <h2>Why Choose Class Sync?</h2>
     <div class="feature-grid">
         <div class="card">
             <h3>Real-time Updates</h3>
-            <p>Instant timetable updates across all users.</p>
+            <p>All users get instant timetable updates without manual refresh.</p>
         </div>
         <div class="card highlight">
-            <h3>Role-based Access</h3>
-            <p>Admins, teachers, and students see what matters to them.</p>
+            <h3>Role-based Views</h3>
+            <p>Customized dashboards for admins, teachers, and students.</p>
         </div>
         <div class="card">
-            <h3>Easy Integration</h3>
-            <p>Works with existing systems and tools.</p>
+            <h3>Seamless Integration</h3>
+            <p>Works alongside your existing academic systems effortlessly.</p>
         </div>
     </div>
 </section>
