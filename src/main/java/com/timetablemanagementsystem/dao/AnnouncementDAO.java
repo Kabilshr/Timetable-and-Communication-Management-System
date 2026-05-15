@@ -76,4 +76,24 @@ public class AnnouncementDAO {
             return false;
         }
     }
+
+    /**
+     * Updates an existing announcement's title and content.
+     */
+    public boolean updateAnnouncement(int id, String title, String content) {
+        String query = "UPDATE announcements SET title = ?, content = ? WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, title);
+            stmt.setString(2, content);
+            stmt.setInt(3, id);
+            int rows = stmt.executeUpdate();
+            System.out.println("DEBUG: Announcement updated successfully. Rows affected: " + rows);
+            return rows > 0;
+        } catch (SQLException e) {
+            System.err.println("DEBUG ERROR: Failed to update announcement: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

@@ -58,10 +58,12 @@
                                     <td>${a.createdAt}</td>
                                     <td><strong>${a.title}</strong></td>
                                     <td>
+                                        <button type="button" class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" 
+                                                onclick="openEditModal('${a.id}', `${a.title}`, `${a.content}`)">Edit</button>
                                         <form action="admin-dashboard" method="POST" style="display:inline">
                                             <input type="hidden" name="action" value="deleteAnnouncement">
-                                            <input type="hidden" name="id" value="${a['id']}">
-                                            <button type="submit" class="btn-delete">Delete</button>
+                                            <input type="hidden" name="id" value="${a.id}">
+                                            <button type="submit" class="btn-delete" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Delete</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -74,6 +76,52 @@
         </div>
     </div>
 </div>
+
+<!-- Edit Announcement Modal -->
+<div id="editModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <div class="section-header">
+            <h2>Edit Announcement</h2>
+        </div>
+        <form action="admin-dashboard" method="POST" class="add-form">
+            <input type="hidden" name="action" value="updateAnnouncement">
+            <input type="hidden" id="edit-id" name="id">
+            <div class="form-group">
+                <label class="form-label">Title</label>
+                <input type="text" id="edit-title" name="title" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Content</label>
+                <textarea id="edit-content" name="content" class="form-input" style="height: 150px; resize: vertical;" required></textarea>
+            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button type="submit" class="btn-primary" style="width: auto; padding: 0.75rem 2rem">Save Changes</button>
+                <button type="button" class="btn-secondary" onclick="closeEditModal()" style="width: auto; padding: 0.75rem 2rem">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openEditModal(id, title, content) {
+        document.getElementById('edit-id').value = id;
+        document.getElementById('edit-title').value = title;
+        document.getElementById('edit-content').value = content;
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+        let modal = document.getElementById('editModal');
+        if (event.target == modal) {
+            closeEditModal();
+        }
+    }
+</script>
 
 </body>
 </html>

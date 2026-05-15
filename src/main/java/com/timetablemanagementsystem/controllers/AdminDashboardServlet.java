@@ -134,6 +134,33 @@ public class AdminDashboardServlet extends HttpServlet {
                 announcementDAO.addAnnouncement(request.getParameter("title"), request.getParameter("content"));
                 redirectView = "announcements";
                 break;
+            case "updateAnnouncement":
+                // Handle announcement update
+                try {
+                    int announcementId = Integer.parseInt(request.getParameter("id"));
+                    String title = request.getParameter("title");
+                    String content = request.getParameter("content");
+                    
+                    HttpSession session = request.getSession(false);
+                    User admin = (User) session.getAttribute("user");
+                    int adminId = admin.getUserId();
+                    java.sql.Timestamp now = new java.sql.Timestamp(System.currentTimeMillis());
+
+                    if (title != null && !title.trim().isEmpty() && content != null && !content.trim().isEmpty()) {
+                        boolean success = announcementDAO.updateAnnouncement(announcementId, title, content);
+                        if (success) {
+                            System.out.println(String.format("[%s] SUCCESS: Admin %d updated Announcement %d", now, adminId, announcementId));
+                        } else {
+                            System.err.println(String.format("[%s] FAILURE: Admin %d failed to update Announcement %d (DB error or invalid ID)", now, adminId, announcementId));
+                        }
+                    } else {
+                        System.err.println(String.format("[%s] FAILURE: Admin %d attempted update with empty fields for Announcement %d", now, adminId, announcementId));
+                    }
+                } catch (Exception e) {
+                    System.err.println("DEBUG ERROR: Error processing updateAnnouncement: " + e.getMessage());
+                }
+                redirectView = "announcements";
+                break;
             case "deleteAnnouncement":
                 announcementDAO.deleteAnnouncement(Integer.parseInt(request.getParameter("id")));
                 redirectView = "announcements";
