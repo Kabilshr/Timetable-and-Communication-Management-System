@@ -53,19 +53,25 @@ public class AdminDashboardServlet extends HttpServlet {
             System.out.println("DEBUG: Admin view requested: " + view);
 
             if ("dashboard".equals(view)) {
-                // ...
                 request.setAttribute("totalUsers", userDAO.getUserCount());
-                // ...
+                request.setAttribute("totalStudents", userDAO.getCountByRole("Student"));
+                request.setAttribute("totalTeachers", userDAO.getCountByRole("Teacher"));
+                request.setAttribute("totalClasses", timetableDAO.getClassCount());
+                request.setAttribute("users", userDAO.getAllUsers());
+                
                 System.out.println("DEBUG: Forwarding to /WEB-INF/pages/admin-dashboard.jsp");
                 request.getRequestDispatcher("/WEB-INF/pages/admin-dashboard.jsp").forward(request, response);
             } else if ("schedule".equals(view)) {
-                // ...
+                request.setAttribute("teachers", teacherDAO.getAllTeachers());
+                request.setAttribute("modules", moduleDAO.getAllModules());
+                request.setAttribute("sections", sectionDAO.getAllSections());
+                request.setAttribute("timetable", timetableDAO.getTimetable());
                 request.getRequestDispatcher("/WEB-INF/pages/manage-schedule.jsp").forward(request, response);
             } else if ("teachers".equals(view)) {
-                // ...
+                request.setAttribute("teachers", teacherDAO.getAllTeachers());
                 request.getRequestDispatcher("/WEB-INF/pages/manage-teachers.jsp").forward(request, response);
             } else if ("announcements".equals(view)) {
-                // ...
+                request.setAttribute("announcements", announcementDAO.getAllAnnouncements());
                 request.getRequestDispatcher("/WEB-INF/pages/manage-announcements.jsp").forward(request, response);
             }
         } catch (Exception e) {

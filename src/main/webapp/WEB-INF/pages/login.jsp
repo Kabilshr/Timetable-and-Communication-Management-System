@@ -84,12 +84,11 @@
                 <div>
                     <div class="pass-header">
                         <label class="field-label" for="password">Password</label>
-                        <a class="forgot-link" href="#">Forgot Password?</a>
                     </div>
                     <div class="input-rel">
                         <span class="material-symbols-outlined input-icon-left">lock</span>
                         <input class="field-input" id="password" name="password" 
-                               placeholder="••••••••" type="password" required/>
+                               placeholder="" type="password" required/>
                     </div>
                 </div>
 

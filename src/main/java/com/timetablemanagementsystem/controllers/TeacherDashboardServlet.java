@@ -83,6 +83,7 @@ public class TeacherDashboardServlet extends HttpServlet {
                 request.setAttribute("todayClasses", todayClasses);
                 request.setAttribute("announcements", recent);
                 request.setAttribute("todayDay", todayFull);
+                request.setAttribute("teacher", teacher);
 
             } else if ("schedule".equals(view)) {
                 List<TimetableEntry> timetable = timetableDAO.getTimetable(teacherId, -1, null);
@@ -91,13 +92,12 @@ public class TeacherDashboardServlet extends HttpServlet {
                 System.out.println("DEBUG: Schedule view, teacher_id=" + teacherId + ", merged size: " + timetable.size());
                 
                 request.setAttribute("timetable", timetable);
+                request.setAttribute("teacher", teacher);
 
             } else if ("announcements".equals(view)) {
                 List<Announcement> announcements = announcementDAO.getAllAnnouncements();
-                for (Announcement a : announcements) {
-                    System.out.println("DEBUG: Rendering announcement: " + a.getTitle());
-                }
                 request.setAttribute("announcements", announcements);
+                request.setAttribute("teacher", teacher);
 
             } else if ("collaboration".equals(view)) {
                 String[] selectedTeacherIds = request.getParameterValues("teachers");
