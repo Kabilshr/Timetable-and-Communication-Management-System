@@ -174,37 +174,38 @@
                         
                         <!-- Filter UI -->
                         <div style="background: #f8fafc; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e2e8f0; margin: 1.5rem 0;">
-                            <form id="compareForm" action="student-dashboard" method="GET" style="display: flex; flex-direction: column; gap: 1rem;">
-                                <input type="hidden" name="view" value="compare">
-                                <input type="hidden" name="sectionIds" id="selectedSectionIds" value="${rawSelectedIds}">
-                                
-                                <div style="display: flex; gap: 1rem; align-items: flex-end;">
-                                    <div class="form-group" style="flex: 1; margin: 0;">
-                                        <label class="form-label">Add Section to Compare</label>
-                                        <!-- DEBUG: Available Sections: ${fn:length(sections)} -->
-                                        <select id="sectionSelect" class="form-select">
-                                            <option value="" disabled selected>Choose a section...</option>
-                                            <c:forEach items="${sections}" var="s">
-                                                <option value="${s.sectionId}">${s.year} - ${s.sectionName}</option>
-                                            </c:forEach>
-                                        </select>
-                                    </div>
-                                    <button type="button" class="btn-primary" style="width: auto; padding: 0.75rem 1.5rem;" onclick="addSectionChip()">Add Section</button>
-                                </div>
-
-                                <div id="chipsContainer" style="display: flex; flex-wrap: wrap; gap: 0.5rem; min-height: 40px; padding: 0.5rem; background: white; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
-                                    <c:forEach items="${selectedSections}" var="ss">
-                                        <div class="chip" data-id="${ss.sectionId}">
-                                            ${ss.year} - ${ss.sectionName}
-                                            <span class="chip-remove" onclick="removeSectionChip('${ss.sectionId}', this.parentElement)">×</span>
-                                        </div>
-                                    </c:forEach>
-                                </div>
-                                
-                                <div style="display: flex; justify-content: flex-end;">
-                                    <button type="submit" class="btn-primary" style="width: auto; padding: 0.75rem 2rem;">Compare Schedules</button>
-                                </div>
-                            </form>
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+							    <form id="compareForm" action="student-dashboard" method="GET" style="display: flex; flex-direction: column; gap: 1rem;">
+								    <input type="hidden" name="view" value="compare">
+								    <input type="hidden" name="sectionIds" id="selectedSectionIds" value="${rawSelectedIds}">
+								
+								    <div style="display: flex; gap: 1rem; align-items: flex-end;">
+								        <div class="form-group" style="flex: 1; margin: 0;">
+								            <label class="form-label">Add Section to Compare</label>
+								            <!-- Remove name attribute to prevent submission -->
+								            <select id="sectionSelect" class="form-select">
+								                <option value="" disabled selected>Choose a section...</option>
+								                <c:forEach items="${sections}" var="s">
+								                    <option value="${s.sectionId}">${s.year} - ${s.sectionName}</option>
+								                </c:forEach>
+								            </select>
+								        </div>
+								        <button type="button" class="btn-primary" style="width: auto; padding: 0.75rem 1.5rem;" onclick="addSectionChip()">Add Section</button>
+								    </div>
+								
+								    <div id="chipsContainer" style="display: flex; flex-wrap: wrap; gap: 0.5rem; min-height: 40px; padding: 0.5rem; background: white; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+								        <c:forEach items="${selectedSections}" var="ss">
+								            <div class="chip" data-id="${ss.sectionId}">
+								                ${ss.year} - ${ss.sectionName}
+								                <span class="chip-remove" onclick="removeSectionChip('${ss.sectionId}', this.parentElement)">×</span>
+								            </div>
+								        </c:forEach>
+								    </div>
+								
+								    <div style="display: flex; justify-content: flex-end;">
+								        <button type="submit" class="btn-primary" style="width: auto; padding: 0.75rem 2rem;">Compare Schedules</button>
+								    </div>
+								</form>
                         </div>
 
                         <style>
@@ -215,41 +216,121 @@
                         </style>
 
                         <script>
-                            let selectedIds = "${rawSelectedIds}" ? "${rawSelectedIds}".split(',').filter(id => id.length > 0) : [];
+						    // Initialize selectedIds from server-side value
+						    let selectedIds = [];
+						    const rawIds = "${rawSelectedIds}";
+						    if (rawIds && rawIds.trim().length > 0) {
+						        selectedIds = rawIds.split(',').filter(id => id.trim().length > 0).map(id => id.trim());
+						    }
+						    console.log("DEBUG: Initial selectedIds:", selectedIds);
+						
+						    function updateHiddenInput() {
+						        const hiddenInput = document.getElementById('selectedSectionIds');
+						        if (hiddenInput) {
+						            hiddenInput.value = selectedIds.join(',');
+						            console.log("DEBUG: Updated hidden input value:", hiddenInput.value);
+						        }
+						    }
+						
+						    function addSectionChip() {
+						        const select = document.getElementById('sectionSelect');
+						        if (!select || select.selectedIndex < 0) {
+						            console.log("DEBUG: No section selected or select element missing");
+						            return;
+						        }
+						
+						        const option = select.options[select.selectedIndex];
+						        const id = option.value;
+						        const text = option.text;
+						
+						        if (!id || id === "" || selectedIds.includes(id.toString())) {
+						            console.log("DEBUG: Section already added or invalid ID. Current IDs:", selectedIds);
+						            return;
+						        }
+						
+						        selectedIds.push(id.toString());
+						        updateHiddenInput();
+						
+						        const container = document.getElementById('chipsContainer');
+						
+						        // Create chip element
+						        const chip = document.createElement('div');
+						        chip.className = 'chip';
+						        chip.setAttribute('data-id', id);
+						
+						        const textSpan = document.createElement('span');
+						        textSpan.textContent = text;
+						
+						        const removeBtn = document.createElement('span');
+						        removeBtn.className = 'chip-remove';
+						        removeBtn.textContent = '×';
+						        removeBtn.style.cursor = 'pointer';
+						        removeBtn.onclick = function() { removeSectionChip(id, chip); };
+						
+						        chip.appendChild(textSpan);
+						        chip.appendChild(removeBtn);
+						        container.appendChild(chip);
+						
+						        console.log("DEBUG: Chip successfully added to UI for Section:", text, "(ID: " + id + ")");
+						    }
+						
+						    function removeSectionChip(id, chipElement) {
+						        console.log("DEBUG: Request to remove section ID:", id);
+						        selectedIds = selectedIds.filter(sid => sid !== id.toString());
+						        updateHiddenInput();
+						
+						        if (chipElement) {
+						            chipElement.remove();
+						            console.log("DEBUG: Chip successfully removed from UI for ID:", id);
+						        }
+						    }
+						
+						    // Prepopulate chips on page load
+						    document.addEventListener('DOMContentLoaded', function() {
+						        updateHiddenInput();
+						
+						        const container = document.getElementById('chipsContainer');
+						        selectedIds.forEach(id => {
+						            const option = document.querySelector(`#sectionSelect option[value='${id}']`);
+						            if (option) {
+						                const chip = document.createElement('div');
+						                chip.className = 'chip';
+						                chip.setAttribute('data-id', id);
+						
+						                const textSpan = document.createElement('span');
+						                textSpan.textContent = option.text;
+						
+						                const removeBtn = document.createElement('span');
+						                removeBtn.className = 'chip-remove';
+						                removeBtn.textContent = '×';
+						                removeBtn.style.cursor = 'pointer';
+						                removeBtn.onclick = function() { removeSectionChip(id, chip); };
+						
+						                chip.appendChild(textSpan);
+						                chip.appendChild(removeBtn);
+						                container.appendChild(chip);
+						            }
+						        });
+						
+						        console.log("DEBUG: Page loaded, hidden input synced, chips prepopulated");
+						    });
+						    document.addEventListener('DOMContentLoaded', function() {
+						        const container = document.getElementById('chipsContainer');
+						        if (!container) return;
 
-                            function updateHiddenInput() {
-                                document.getElementById('selectedSectionIds').value = selectedIds.join(',');
-                            }
+						        // Remove any placeholder chip that says "Choose a section..."
+						        const chips = container.querySelectorAll('.chip');
+						        chips.forEach(chip => {
+						            const textSpan = chip.querySelector('span');
+						            if (textSpan && textSpan.textContent.trim() === 'Choose a section...') {
+						                chip.remove();
+						                console.log('DEBUG: Removed placeholder chip:', textSpan.textContent);
+						            }
+						        });
 
-                            function addSectionChip() {
-                                const select = document.getElementById('sectionSelect');
-                                const id = select.value;
-                                const text = select.options[select.selectedIndex].text;
-                                
-                                if (!id || selectedIds.includes(id)) return;
-                                
-                                selectedIds.push(id);
-                                updateHiddenInput();
-                                
-                                const container = document.getElementById('chipsContainer');
-                                const chip = document.createElement('div');
-                                chip.className = 'chip';
-                                chip.setAttribute('data-id', id);
-                                chip.innerHTML = `${text} <span class="chip-remove" onclick="removeSectionChip('${id}', this)">×</span>`;
-                                
-                                container.appendChild(chip);
-                            }
-
-                            function removeSectionChip(id, element) {
-                                // If clicked on span, element is the chip div. If called with 'this', it depends on context.
-                                // Let's ensure we target the div.
-                                const chipDiv = element.closest('.chip');
-                                selectedIds = selectedIds.filter(sid => sid !== id.toString());
-                                updateHiddenInput();
-                                chipDiv.remove();
-                            }
-                        </script>
-
+						        console.log('DEBUG: Post-load chip cleanup done');
+						    });
+						</script>
                         <!-- Calendar Rendering -->
                         <!-- DEBUG: Combined Timetable Size: ${fn:length(combinedTimetable)} -->
                         <div class="timetable-container">
@@ -275,7 +356,27 @@
                                                         <c:set var="top" value="${(minutesFromStart * 2) + 56}" />
                                                         <c:set var="height" value="${(endMinutes - startMinutes) * 2}" />
                                                         
-                                                        <%-- Check for overlaps with other selected sections --%>
+                                                        <%-- Define section-based colors --%>
+                                                        <c:set var="colorIndex" value="${e.sectionId % 5}" />
+                                                        <c:choose>
+                                                            <c:when test="${colorIndex == 0}">
+                                                                <c:set var="bgColor" value="#dcfce7" /><c:set var="borderColor" value="#166534" /><c:set var="textColor" value="#166534" />
+                                                            </c:when>
+                                                            <c:when test="${colorIndex == 1}">
+                                                                <c:set var="bgColor" value="#dbeafe" /><c:set var="borderColor" value="#1e40af" /><c:set var="textColor" value="#1e40af" />
+                                                            </c:when>
+                                                            <c:when test="${colorIndex == 2}">
+                                                                <c:set var="bgColor" value="#fef3c7" /><c:set var="borderColor" value="#92400e" /><c:set var="textColor" value="#92400e" />
+                                                            </c:when>
+                                                            <c:when test="${colorIndex == 3}">
+                                                                <c:set var="bgColor" value="#ede9fe" /><c:set var="borderColor" value="#5b21b6" /><c:set var="textColor" value="#5b21b6" />
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <c:set var="bgColor" value="#fce7f3" /><c:set var="borderColor" value="#9d174d" /><c:set var="textColor" value="#9d174d" />
+                                                            </c:otherwise>
+                                                        </c:choose>
+
+                                                        <%-- Check for overlaps --%>
                                                         <c:set var="isOverlap" value="false" />
                                                         <c:forEach items="${combinedTimetable}" var="e2">
                                                             <c:if test="${e2.day == day && e2.entryId != e.entryId}">
@@ -288,7 +389,11 @@
                                                         </c:forEach>
 
                                                         <div class="class-block ${isOverlap ? 'overlap-warning' : ''}" 
-                                                             style="top: ${top}px; height: ${height}px; background: ${isOverlap ? '#fef2f2' : '#dcfce7'} !important; color: ${isOverlap ? '#991b1b' : '#166534'} !important; border-left: 4px solid ${isOverlap ? '#ef4444' : '#166534'};">
+                                                             style="top: ${top}px; 
+														       height: ${height}px; 
+														       background: ${isOverlap ? '#fef2f2' : '#0f5cc0'} !important; 
+														       color: ${isOverlap ? '#991b1b' : '#ffffff'} !important; 
+														       border-left: 4px solid ${isOverlap ? '#ef4444' : '#0c46a0'};">
                                                             <div class="block-module">${e.moduleTitle}</div>
                                                             <div class="block-lecturer" style="font-size: 0.65rem;">Section: ${e.year} ${e.sectionName}</div>
                                                             <div class="block-time"><fmt:formatDate value="${e.startTime}" pattern="hh:mm a" /> - <fmt:formatDate value="${e.endTime}" pattern="hh:mm a" /></div>

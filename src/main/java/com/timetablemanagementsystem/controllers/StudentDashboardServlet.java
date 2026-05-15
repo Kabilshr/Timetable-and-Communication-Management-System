@@ -82,20 +82,22 @@ public class StudentDashboardServlet extends HttpServlet {
             } else if ("compare".equals(view)) {
                 System.out.println("DEBUG: Entering Compare View - Fetching all sections");
                 List<Section> sections = sectionDAO.getAllSections();
+                System.out.println("DEBUG: Total sections available for dropdown: " + (sections != null ? sections.size() : 0));
                 request.setAttribute("sections", sections);
 
                 String rawSectionIds = request.getParameter("sectionIds");
                 List<Integer> selectedIds = new ArrayList<>();
                 List<Section> selectedSectionObjects = new ArrayList<>();
 
-                System.out.println("DEBUG: Received raw sectionIds parameter: \"" + (rawSectionIds != null ? rawSectionIds : "") + "\"");
+                System.out.println("DEBUG: Received raw sectionIds parameter: \"" + (rawSectionIds != null ? rawSectionIds : "null") + "\"");
 
                 if (rawSectionIds != null && !rawSectionIds.trim().isEmpty()) {
                     String[] parts = rawSectionIds.split(",");
                     for (String idStr : parts) {
-                        if (idStr != null && !idStr.trim().isEmpty()) {
+                        String trimmedId = idStr.trim();
+                        if (!trimmedId.isEmpty()) {
                             try {
-                                int id = Integer.parseInt(idStr.trim());
+                                int id = Integer.parseInt(trimmedId);
                                 selectedIds.add(id);
                                 if (sections != null) {
                                     for (Section s : sections) {
@@ -106,15 +108,15 @@ public class StudentDashboardServlet extends HttpServlet {
                                     }
                                 }
                             } catch (NumberFormatException e) {
-                                System.err.println("DEBUG: Skipping invalid sectionId token: " + idStr);
+                                System.err.println("DEBUG: Error parsing section ID: \"" + trimmedId + "\"");
                             }
                         }
                     }
                 }
 
-                System.out.println("DEBUG: Parsed Selected IDs: " + selectedIds);
+                System.out.println("DEBUG: Final Parsed Selected IDs: " + selectedIds);
                 List<TimetableEntry> combinedTimetable = !selectedIds.isEmpty() ? timetableDAO.fetchTimetableBySections(selectedIds) : new ArrayList<>();
-                System.out.println("DEBUG: Fetched " + combinedTimetable.size() + " entries for comparison");
+                System.out.println("DEBUG: Successfully fetched " + combinedTimetable.size() + " entries for comparison");
 
                 request.setAttribute("selectedSections", selectedSectionObjects);
                 request.setAttribute("combinedTimetable", combinedTimetable);
