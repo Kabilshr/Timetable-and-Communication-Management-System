@@ -94,7 +94,9 @@ public class TeacherDashboardServlet extends HttpServlet {
 
             } else if ("announcements".equals(view)) {
                 List<Announcement> announcements = announcementDAO.getAllAnnouncements();
-                System.out.println("DEBUG: Announcements view, count: " + announcements.size());
+                for (Announcement a : announcements) {
+                    System.out.println("DEBUG: Rendering announcement: " + a.getTitle());
+                }
                 request.setAttribute("announcements", announcements);
 
             } else if ("collaboration".equals(view)) {

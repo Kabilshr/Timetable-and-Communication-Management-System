@@ -70,6 +70,43 @@ public class TimetableDAO {
         return list;
     }
 
+    public List<TimetableEntry> fetchTimetableBySections(List<Integer> sectionIds) {
+        List<TimetableEntry> list = new ArrayList<>();
+        if (sectionIds == null || sectionIds.isEmpty()) return list;
+
+        StringBuilder query = new StringBuilder(
+            "SELECT t.*, m.module_title, u.name as lecturer_name, sec.year, sec.section_name " +
+            "FROM timetable t " +
+            "JOIN modules m ON t.module_code = m.module_code " +
+            "JOIN teachers te ON t.lecturer_id = te.teacher_id " +
+            "JOIN users u ON te.user_id = u.user_id " +
+            "JOIN sections sec ON t.section_id = sec.section_id " +
+            "WHERE t.section_id IN ("
+        );
+
+        for (int i = 0; i < sectionIds.size(); i++) {
+            query.append("?");
+            if (i < sectionIds.size() - 1) query.append(",");
+        }
+        query.append(") ORDER BY t.day, t.start_time ASC");
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query.toString())) {
+            
+            for (int i = 0; i < sectionIds.size(); i++) {
+                stmt.setInt(i + 1, sectionIds.get(i));
+            }
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                list.add(mapResultSetToEntry(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     public boolean deleteEntry(int id) {
         String query = "DELETE FROM timetable WHERE entry_id = ?";
         try (Connection conn = DBConnection.getConnection();

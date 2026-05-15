@@ -71,7 +71,6 @@
                     <div class="admin-section">
                         <div class="section-header">
                             <h2>User Management</h2>
-                            <button class="btn-primary" style="width: auto; padding: 0.6rem 1.2rem;" onclick="alert('Use registration page to add users')">Add New User</button>
                         </div>
                         <table class="admin-table">
                             <thead>

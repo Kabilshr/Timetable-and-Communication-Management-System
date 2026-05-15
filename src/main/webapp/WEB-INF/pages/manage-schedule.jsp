@@ -122,16 +122,6 @@
 
                 <hr style="margin: 2rem 0; border: 0; border-top: 1px solid var(--outline-variant);">
 
-                <div class="section-header">
-                    <h2>Bulk Upload (JSON)</h2>
-                </div>
-                <form action="<%= path %>/upload-schedule" method="POST" enctype="multipart/form-data" style="display: flex; gap: 1rem; align-items: flex-end;">
-                    <div class="form-group" style="margin: 0; flex: 1;">
-                        <label class="form-label" style="font-size: 0.7rem;">Select JSON File</label>
-                        <input type="file" name="file" class="form-input" accept=".json" required>
-                    </div>
-                    <button type="submit" class="btn-primary" style="padding: 0.6rem 2rem;">Upload Schedule</button>
-                </form>
             </div>
 
             <div class="admin-section">

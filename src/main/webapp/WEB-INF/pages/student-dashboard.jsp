@@ -62,23 +62,28 @@
                                 </h2>
                                 <c:choose>
                                     <c:when test="${not empty todayClasses}">
-                                        <div class="today-grid">
-                                            <c:forEach items="${todayClasses}" var="tc">
-                                                <div class="today-card">
-                                                    <div style="color: var(--primary); font-weight: 800; font-size: 0.9rem; margin-bottom: 0.5rem;">${fn:substring(tc.startTime, 0, 5)}</div>
-                                                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">${tc.moduleTitle}</h3>
-                                                    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-                                                        <span style="font-size: 0.85rem; color: #64748b; display: flex; align-items: center; gap: 0.5rem;">
-                                                            <span class="material-symbols-outlined" style="font-size: 16px;">person</span> ${tc.lecturerName}
-                                                        </span>
-                                                        <span style="font-size: 0.85rem; color: #64748b; display: flex; align-items: center; gap: 0.5rem;">
-                                                            <span class="material-symbols-outlined" style="font-size: 16px;">location_on</span> Room ${tc.room}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </c:forEach>
-                                        </div>
-                                    </c:when>
+									    <div class="today-grid">
+									        <c:forEach items="${todayClasses}" var="tc">
+									            <div class="today-card" style="padding: 1rem; border-radius: 12px; background-color: #f9fafb; box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-bottom: 1rem;">
+									                <!-- Start time -->
+									                <div style="color: var(--primary); font-weight: 800; font-size: 0.9rem; margin-bottom: 0.5rem;">
+									                    ${fn:substring(tc.startTime, 0, 5)}
+									                </div>
+									                <!-- Module title -->
+									                <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">${tc.moduleTitle}</h3>
+									                <!-- Lecturer and Room info -->
+									                <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+									                    <span style="font-size: 0.85rem; color: #64748b; display: flex; align-items: center; gap: 0.5rem;">
+									                        <span class="material-symbols-outlined" style="font-size: 16px;">person</span> ${tc.lecturerName}
+									                    </span>
+									                    <span style="font-size: 0.85rem; color: #64748b; display: flex; align-items: center; gap: 0.5rem;">
+									                        <span class="material-symbols-outlined" style="font-size: 16px;">location_on</span> Room ${tc.room}
+									                    </span>
+									                </div>
+									            </div>
+									        </c:forEach>
+									    </div>
+									</c:when>
                                     <c:otherwise>
                                         <div style="text-align: center; padding: 3rem; color: #94a3b8;">
                                             <span class="material-symbols-outlined" style="font-size: 48px; margin-bottom: 1rem;">event_busy</span>
@@ -114,62 +119,6 @@
                                 <div style="background: #eef2f7; padding: 1rem; margin-bottom: 1rem; border-radius: 12px; font-size: 0.8rem;">
                                     <strong>DEBUG:</strong> Entries = ${fn:length(timetable)}
                                 </div>
-                                <style>
-                                    .timetable-scroll { width: 100%; overflow-x: auto; overflow-y: hidden; }
-                                    .timetable-wrapper { min-width: 800px; position: relative; margin-top: 2rem; border: 1px solid #d6dce5; }
-                                    .timetable-grid { 
-                                        display: grid; 
-                                        grid-template-columns: 80px repeat(6, 1fr); 
-                                        grid-auto-rows: 120px;
-                                        background: white;
-                                    }
-                                    .grid-time { padding: 0.5rem; background: #f8fafc; text-align: right; font-size: 0.75rem; color: #94a3b8; border-bottom: 1px solid #d6dce5; border-right: 1px solid #d6dce5; }
-                                    .grid-day { 
-                                        height: 48px; padding: 0; font-size: 0.95rem; font-weight: 700; color: #64748b; 
-                                        display: flex; align-items: center; justify-content: center;
-                                        background: #f8fafc; border-bottom: 2px solid #d6dce5; border-right: 1px solid #d6dce5; 
-                                    }
-                                    .grid-cell { background: white; border-bottom: 1px solid #f8fafc; border-right: 1px solid #f8fafc; }
-                                    
-                                    .overlay-layer {
-                                        position: absolute;
-                                        top: 48px; /* New compact header height */
-                                        left: 80px;
-                                        right: 0;
-                                        height: 1440px; 
-                                        display: grid;
-                                        grid-template-columns: repeat(6, 1fr);
-                                        pointer-events: none;
-                                    }
-                                    .day-column { position: relative; }
-                                    
-                                    .class-block { 
-                                        position: absolute;
-                                        left: 4px;
-                                        right: 4px;
-                                        pointer-events: auto;
-                                        z-index: 10;
-                                        padding: 6px;
-                                        background: #0059bb; 
-                                        color: white; 
-                                        border-radius: 6px; 
-                                        border-left: 4px solid #003f88;
-                                        box-sizing: border-box;
-                                        display: flex;
-                                        flex-direction: column;
-                                        gap: 1px;
-                                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                                        overflow: hidden;
-                                    }
-                                    .block-module { font-weight: 800; font-size: 0.7rem; }
-                                    .block-lecturer { font-weight: 500; opacity: 0.9; font-size: 0.65rem; }
-                                    .block-time, .block-room { opacity: 0.8; font-size: 0.6rem; }
-
-                                    @media (max-width: 768px) {
-                                        .class-block { padding: 4px; }
-                                        .block-module { font-size: 0.65rem; }
-                                    }
-                                </style>
                                 <div class="timetable-scroll">
                                     <div class="timetable-wrapper">
                                         <div class="timetable-grid">
@@ -220,38 +169,137 @@
 
                 <c:when test="${view == 'compare'}">
                     <div class="admin-section">
-                        <h1>Compare Module Schedules</h1>
-                        <form action="student-dashboard" method="GET" style="margin: 1.5rem 0; display: flex; flex-wrap: wrap; gap: 1rem;">
-                            <input type="hidden" name="view" value="compare">
-                            <c:forEach items="${modules}" var="s">
-                                <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; background: #f8fafc; padding: 0.5rem 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; cursor: pointer;">
-                                    <input type="checkbox" name="modules" value="${s.moduleCode}" <c:forEach items="${selectedModules}" var="sel"><c:if test="${sel == s.moduleCode}">checked</c:if></c:forEach>>
-                                    ${s.moduleTitle}
-                                </label>
-                            </c:forEach>
-                            <button type="submit" class="btn-primary" style="width: auto;">Update Comparison</button>
-                        </form>
+                        <h1>Compare Section Schedules</h1>
+                        <p class="text-secondary">Select multiple sections to view their combined timetables and identify overlaps.</p>
                         
-                        <div class="calendar-grid" style="grid-template-columns: 100px repeat(6, 1fr);">
-                            <div class="calendar-header" style="background: transparent;"></div>
-                            <div class="calendar-header">Sunday</div><div class="calendar-header">Monday</div><div class="calendar-header">Tuesday</div><div class="calendar-header">Wednesday</div><div class="calendar-header">Thursday</div><div class="calendar-header">Friday</div>
-                            <c:set var="days" value="${fn:split('Sunday,Monday,Tuesday,Wednesday,Thursday,Friday', ',')}" />
-                            <c:set var="times" value="${fn:split('08:00,09:00,10:00,11:00,12:00,13:00,14:00,15:00,16:00,17:00', ',')}" />
-                            <c:forEach items="${times}" var="time">
-                                <div class="time-label">${time}</div>
-                                <c:forEach items="${days}" var="day">
-                                    <c:set var="count" value="0" />
-                                    <c:forEach items="${combinedTimetable}" var="e"><c:if test="${e.day == day && fn:substring(e.startTime, 0, 5) == time}"><c:set var="count" value="${count + 1}" /></c:if></c:forEach>
-                                    <div class="calendar-cell ${count > 1 ? 'overlap-alert' : ''}">
-                                        <c:if test="${count > 1}"><div class="overlap-badge">CONFLICT</div></c:if>
-                                        <c:forEach items="${combinedTimetable}" var="e">
-                                            <c:if test="${e.day == day && fn:substring(e.startTime, 0, 5) == time}">
-                                                <div class="class-bubble" style="margin-bottom: 4px; padding: 0.5rem;"><strong>${e.moduleTitle}</strong></div>
-                                            </c:if>
+                        <!-- Filter UI -->
+                        <div style="background: #f8fafc; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e2e8f0; margin: 1.5rem 0;">
+                            <form id="compareForm" action="student-dashboard" method="GET" style="display: flex; flex-direction: column; gap: 1rem;">
+                                <input type="hidden" name="view" value="compare">
+                                <input type="hidden" name="sectionIds" id="selectedSectionIds" value="${rawSelectedIds}">
+                                
+                                <div style="display: flex; gap: 1rem; align-items: flex-end;">
+                                    <div class="form-group" style="flex: 1; margin: 0;">
+                                        <label class="form-label">Add Section to Compare</label>
+                                        <!-- DEBUG: Available Sections: ${fn:length(sections)} -->
+                                        <select id="sectionSelect" class="form-select">
+                                            <option value="" disabled selected>Choose a section...</option>
+                                            <c:forEach items="${sections}" var="s">
+                                                <option value="${s.sectionId}">${s.year} - ${s.sectionName}</option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+                                    <button type="button" class="btn-primary" style="width: auto; padding: 0.75rem 1.5rem;" onclick="addSectionChip()">Add Section</button>
+                                </div>
+
+                                <div id="chipsContainer" style="display: flex; flex-wrap: wrap; gap: 0.5rem; min-height: 40px; padding: 0.5rem; background: white; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+                                    <c:forEach items="${selectedSections}" var="ss">
+                                        <div class="chip" data-id="${ss.sectionId}">
+                                            ${ss.year} - ${ss.sectionName}
+                                            <span class="chip-remove" onclick="removeSectionChip('${ss.sectionId}', this.parentElement)">×</span>
+                                        </div>
+                                    </c:forEach>
+                                </div>
+                                
+                                <div style="display: flex; justify-content: flex-end;">
+                                    <button type="submit" class="btn-primary" style="width: auto; padding: 0.75rem 2rem;">Compare Schedules</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <style>
+                            .chip { background: var(--primary); color: white; padding: 0.4rem 0.8rem; border-radius: 999px; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 600; }
+                            .chip-remove { cursor: pointer; opacity: 0.7; font-size: 1.2rem; line-height: 1; }
+                            .chip-remove:hover { opacity: 1; }
+                            .overlap-warning { background: #fef2f2 !important; border-left-color: #ef4444 !important; color: #991b1b !important; }
+                        </style>
+
+                        <script>
+                            let selectedIds = "${rawSelectedIds}" ? "${rawSelectedIds}".split(',').filter(id => id.length > 0) : [];
+
+                            function updateHiddenInput() {
+                                document.getElementById('selectedSectionIds').value = selectedIds.join(',');
+                            }
+
+                            function addSectionChip() {
+                                const select = document.getElementById('sectionSelect');
+                                const id = select.value;
+                                const text = select.options[select.selectedIndex].text;
+                                
+                                if (!id || selectedIds.includes(id)) return;
+                                
+                                selectedIds.push(id);
+                                updateHiddenInput();
+                                
+                                const container = document.getElementById('chipsContainer');
+                                const chip = document.createElement('div');
+                                chip.className = 'chip';
+                                chip.setAttribute('data-id', id);
+                                chip.innerHTML = `${text} <span class="chip-remove" onclick="removeSectionChip('${id}', this)">×</span>`;
+                                
+                                container.appendChild(chip);
+                            }
+
+                            function removeSectionChip(id, element) {
+                                // If clicked on span, element is the chip div. If called with 'this', it depends on context.
+                                // Let's ensure we target the div.
+                                const chipDiv = element.closest('.chip');
+                                selectedIds = selectedIds.filter(sid => sid !== id.toString());
+                                updateHiddenInput();
+                                chipDiv.remove();
+                            }
+                        </script>
+
+                        <!-- Calendar Rendering -->
+                        <!-- DEBUG: Combined Timetable Size: ${fn:length(combinedTimetable)} -->
+                        <div class="timetable-container">
+                            <div class="timetable-scroll">
+                                <div class="timetable-wrapper">
+                                    <div class="timetable-grid">
+                                        <div class="grid-time" style="height: 56px;"></div>
+                                        <div class="day-header">SUN</div><div class="day-header">MON</div><div class="day-header">TUE</div><div class="day-header">WED</div><div class="day-header">THU</div><div class="day-header">FRI</div>
+                                        <c:forEach begin="6" end="17" var="hour">
+                                            <div class="grid-time">${hour}:00</div>
+                                            <c:forEach begin="1" end="6"><div class="grid-cell"></div></c:forEach>
                                         </c:forEach>
                                     </div>
-                                </c:forEach>
-                            </c:forEach>
+                                    <div class="overlay-layer">
+                                        <c:set var="days" value="${fn:split('SUN,MON,TUE,WED,THU,FRI', ',')}" />
+                                        <c:forEach items="${days}" var="day">
+                                            <div class="day-column">
+                                                <c:forEach items="${combinedTimetable}" var="e">
+                                                    <c:if test="${e.day == day}">
+                                                        <c:set var="startMinutes" value="${(e.startTime.hours * 60) + e.startTime.minutes}" />
+                                                        <c:set var="endMinutes" value="${(e.endTime.hours * 60) + e.endTime.minutes}" />
+                                                        <c:set var="minutesFromStart" value="${startMinutes - 360}" />
+                                                        <c:set var="top" value="${(minutesFromStart * 2) + 56}" />
+                                                        <c:set var="height" value="${(endMinutes - startMinutes) * 2}" />
+                                                        
+                                                        <%-- Check for overlaps with other selected sections --%>
+                                                        <c:set var="isOverlap" value="false" />
+                                                        <c:forEach items="${combinedTimetable}" var="e2">
+                                                            <c:if test="${e2.day == day && e2.entryId != e.entryId}">
+                                                                <c:set var="s2" value="${(e2.startTime.hours * 60) + e2.startTime.minutes}" />
+                                                                <c:set var="n2" value="${(e2.endTime.hours * 60) + e2.endTime.minutes}" />
+                                                                <c:if test="${s2 < endMinutes && n2 > startMinutes}">
+                                                                    <c:set var="isOverlap" value="true" />
+                                                                </c:if>
+                                                            </c:if>
+                                                        </c:forEach>
+
+                                                        <div class="class-block ${isOverlap ? 'overlap-warning' : ''}" 
+                                                             style="top: ${top}px; height: ${height}px; background: ${isOverlap ? '#fef2f2' : '#dcfce7'} !important; color: ${isOverlap ? '#991b1b' : '#166534'} !important; border-left: 4px solid ${isOverlap ? '#ef4444' : '#166534'};">
+                                                            <div class="block-module">${e.moduleTitle}</div>
+                                                            <div class="block-lecturer" style="font-size: 0.65rem;">Section: ${e.year} ${e.sectionName}</div>
+                                                            <div class="block-time"><fmt:formatDate value="${e.startTime}" pattern="hh:mm a" /> - <fmt:formatDate value="${e.endTime}" pattern="hh:mm a" /></div>
+                                                        </div>
+                                                    </c:if>
+                                                </c:forEach>
+                                            </div>
+                                        </c:forEach>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </c:when>

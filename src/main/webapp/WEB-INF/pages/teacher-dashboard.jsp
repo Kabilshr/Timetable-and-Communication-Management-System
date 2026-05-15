@@ -12,24 +12,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="<%= path %>/css/style.css">
-    <style>
-        /* Calendar Grid */
-        .calendar-grid { display: grid; grid-template-columns: 80px repeat(6, 1fr); gap: 1px; background: #e2e8f0; border: 1px solid #e2e8f0; border-radius: 1rem; overflow: hidden; }
-        .calendar-header { background: #f1f5f9; padding: 1rem; text-align: center; font-weight: 700; font-size: 0.85rem; color: #64748b; }
-        .time-label { background: white; padding: 1.5rem 0.75rem; text-align: right; font-weight: 600; font-size: 0.75rem; color: #94a3b8; border-right: 1px solid #e2e8f0; }
-        .calendar-cell { background: white; min-height: 110px; padding: 0.5rem; position: relative; }
-        
-        .class-bubble { background: #f1f8e9; color: #2e7d32; padding: 0.75rem; border-radius: 0.75rem; font-size: 0.75rem; border-left: 4px solid #4caf50; }
-        
-        /* Today's Schedule Cards */
-        .today-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
-        .today-card { padding: 1.5rem; background: #f1f8e9; border-radius: 1.25rem; border-left: 6px solid #4caf50; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-
-        .overlap-alert { background: #fff5f5 !important; border: 2px solid #ff4d4d; }
-        .overlap-badge { background: #ff4d4d; color: white; padding: 2px 8px; border-radius: 99px; font-size: 0.6rem; position: absolute; top: 5px; right: 5px; z-index: 10; }
-        .event-card { padding: 0.5rem; border-radius: 0.5rem; font-size: 0.7rem; margin-bottom: 0.25rem; border-left: 3px solid var(--primary); background: #f0f7ff; }
-        .my-event { border-left-color: #4caf50; background: #f1f8e9; }
-    </style>
 </head>
 <body>
 
@@ -169,26 +151,35 @@
 
                 <c:when test="${view == 'announcements'}">
                     <div class="admin-section">
-                        <h1>Manage Announcements</h1>
-                        <div style="margin-top: 1.5rem;">
-                            <h3 style="margin-bottom: 1rem;">Post New Announcement</h3>
-                            <form action="teacher-dashboard" method="POST">
-                                <input type="hidden" name="action" value="addAnnouncement">
-                                <div class="form-group"><label class="form-label">Title</label><input type="text" name="title" class="form-input" required></div>
-                                <div class="form-group"><label class="form-label">Content</label><textarea name="content" class="form-input" style="min-height: 100px;" required></textarea></div>
-                                <button type="submit" class="btn-primary" style="width: auto; padding: 0.75rem 2rem; background: #2e7d32;">Post Announcement</button>
-                            </form>
+                        <div class="section-header">
+                            <h2>Post New Announcement</h2>
                         </div>
+                        <form action="teacher-dashboard" method="POST" class="add-form" style="display: block; padding: 1rem; background-color: #f9fafb; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-bottom: 2rem;">
+						    <input type="hidden" name="action" value="addAnnouncement">
+						    
+						    <div class="form-group" style="margin-bottom: 1rem;">
+						        <label class="form-label" style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Title</label>
+						        <input type="text" name="title" class="form-input" placeholder="Holiday Notice" required style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.95rem;">
+						    </div>
+						    
+						    <div class="form-group" style="margin-bottom: 1rem;">
+						        <label class="form-label" style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Content</label>
+						        <textarea name="content" class="form-input" placeholder="Enter announcement details here..." required style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; height: 120px; resize: vertical;"></textarea>
+						    </div>
+						    
+						    <button type="submit" class="btn-primary" style="padding: 0.75rem 2rem; border-radius: 8px; background-color: #0f5cc0; color: #fff; font-weight: 600; border: none; cursor: pointer;">Post Announcement</button>
+						</form>
                     </div>
-                    <div style="margin-top: 2rem;">
-                        <c:forEach items="${announcements}" var="a">
-                            <div class="admin-section" style="border-left: 5px solid #2e7d32;">
-                                <h3 style="margin-bottom: 0.5rem;">${a.title}</h3>
-                                <small style="color: #94a3b8; display: block; margin-bottom: 1rem;">${a.createdAt}</small>
-                                <p style="color: #64748b;">${a.content}</p>
-                            </div>
-                        </c:forEach>
-                    </div>
+                        <div style="margin-top: 2rem;">
+						    <div class="section-header"><h2>Past Announcements</h2></div>
+						    <c:forEach items="${announcements}" var="a">
+						        <div class="announcement-card" style="margin-bottom: 1.5rem; padding: 1rem; border-radius: 12px; background-color: #f9fafb; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">
+						            <h3 style="margin-bottom: 0.5rem; font-weight: 600; font-size: 1rem;">${a.title}</h3>
+						            <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.75rem;">Posted on: ${a.createdAt}</div>
+						            <p style="color: #64748b; font-size: 0.95rem; line-height: 1.5;">${a.content}</p>
+						        </div>
+						    </c:forEach>
+						</div>
                 </c:when>
 
                 <c:when test="${view == 'collaboration'}">
@@ -208,20 +199,26 @@
                                 <button type="submit" class="btn-primary" style="width: auto; background: #2e7d32;">Compare Schedules</button>
                             </form>
                         </div>
-                        <div class="calendar-grid" style="grid-template-columns: 100px repeat(6, 1fr);">
-                            <div class="calendar-header" style="background: transparent;"></div>
-                            <div class="calendar-header">SUN</div><div class="calendar-header">MON</div><div class="calendar-header">TUE</div><div class="calendar-header">WED</div><div class="calendar-header">THU</div><div class="calendar-header">FRI</div>
+                        <div class="calendar-grid" style="display: grid; grid-template-columns: 100px repeat(6, 1fr); gap: 1px; background: #e2e8f0; border: 1px solid #e2e8f0; border-radius: 1rem; overflow: hidden;">
+                            <div class="calendar-header" style="background: #f1f5f9; padding: 1rem; text-align: center; font-weight: 700; font-size: 0.85rem; color: #64748b;"></div>
+                            <div class="calendar-header" style="background: #f1f5f9; padding: 1rem; text-align: center; font-weight: 700; font-size: 0.85rem; color: #64748b;">SUN</div>
+                            <div class="calendar-header" style="background: #f1f5f9; padding: 1rem; text-align: center; font-weight: 700; font-size: 0.85rem; color: #64748b;">MON</div>
+                            <div class="calendar-header" style="background: #f1f5f9; padding: 1rem; text-align: center; font-weight: 700; font-size: 0.85rem; color: #64748b;">TUE</div>
+                            <div class="calendar-header" style="background: #f1f5f9; padding: 1rem; text-align: center; font-weight: 700; font-size: 0.85rem; color: #64748b;">WED</div>
+                            <div class="calendar-header" style="background: #f1f5f9; padding: 1rem; text-align: center; font-weight: 700; font-size: 0.85rem; color: #64748b;">THU</div>
+                            <div class="calendar-header" style="background: #f1f5f9; padding: 1rem; text-align: center; font-weight: 700; font-size: 0.85rem; color: #64748b;">FRI</div>
+                            
                             <c:set var="days" value="${fn:split('SUN,MON,TUE,WED,THU,FRI', ',')}" />
                             <c:set var="times" value="${fn:split('08:00,09:00,10:00,11:00,12:00,13:00,14:00,15:00,16:00,17:00', ',')}" />
                             <c:forEach items="${times}" var="time">
-                                <div class="time-label">${time}</div>
+                                <div class="time-label" style="background: white; padding: 1.5rem 0.75rem; text-align: right; font-weight: 600; font-size: 0.75rem; color: #94a3b8; border-right: 1px solid #e2e8f0;">${time}</div>
                                 <c:forEach items="${days}" var="day">
                                     <c:set var="count" value="0" /><c:forEach items="${combinedEntries}" var="e"><c:if test="${e.day == day && fn:substring(e.startTime, 0, 5) == time}"><c:set var="count" value="${count + 1}" /></c:if></c:forEach>
-                                    <div class="calendar-cell ${count > 1 ? 'overlap-alert' : ''}" style="min-height: 120px;">
-                                        <c:if test="${count > 1}"><div class="overlap-badge">OVERLAP</div></c:if>
+                                    <div class="calendar-cell ${count > 1 ? 'overlap-alert' : ''}" style="background: white; min-height: 110px; padding: 0.5rem; position: relative;">
+                                        <c:if test="${count > 1}"><div class="overlap-badge" style="background: #ff4d4d; color: white; padding: 2px 8px; border-radius: 99px; font-size: 0.6rem; position: absolute; top: 5px; right: 5px; z-index: 10;">OVERLAP</div></c:if>
                                         <c:forEach items="${combinedEntries}" var="e">
                                             <c:if test="${e.day == day && fn:substring(e.startTime, 0, 5) == time}">
-                                                <div class="event-card ${e.lecturerId == teacherId ? 'my-event' : 'compare-event'}"><strong>${e.moduleTitle}</strong><br><small>${e.lecturerName}</small></div>
+                                                <div class="event-card ${e.lecturerId == teacherId ? 'my-event' : 'compare-event'}" style="padding: 0.5rem; border-radius: 0.5rem; font-size: 0.7rem; margin-bottom: 0.25rem; border-left: 3px solid var(--primary); background: #f0f7ff;"><strong>${e.moduleTitle}</strong><br><small>${e.lecturerName}</small></div>
                                             </c:if>
                                         </c:forEach>
                                     </div>

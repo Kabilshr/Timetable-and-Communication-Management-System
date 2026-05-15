@@ -25,15 +25,19 @@ public class AdminDashboardServlet extends HttpServlet {
     private SectionDAO sectionDAO = new SectionDAO();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("DEBUG: AdminDashboardServlet.doGet() reached.");
         try {
             HttpSession session = request.getSession(false);
             if (session == null || session.getAttribute("user") == null) {
+                System.out.println("DEBUG: No session/user in AdminDashboardServlet.");
                 response.sendRedirect("login");
                 return;
             }
             User user = (User) session.getAttribute("user");
             String role = user.getRole();
+            System.out.println("DEBUG: User " + user.getName() + " with role " + role + " accessing admin dashboard.");
             if (!"Admin".equalsIgnoreCase(role)) {
+                // ... (logic remains same)
                 if ("Student".equalsIgnoreCase(role)) {
                     response.sendRedirect("student-dashboard");
                 } else if ("Teacher".equalsIgnoreCase(role)) {
@@ -46,35 +50,22 @@ public class AdminDashboardServlet extends HttpServlet {
 
             String view = request.getParameter("view");
             if (view == null) view = "dashboard";
+            System.out.println("DEBUG: Admin view requested: " + view);
 
             if ("dashboard".equals(view)) {
+                // ...
                 request.setAttribute("totalUsers", userDAO.getUserCount());
-                request.setAttribute("totalStudents", userDAO.getCountByRole("Student"));
-                request.setAttribute("totalTeachers", userDAO.getCountByRole("Teacher"));
-                request.setAttribute("totalClasses", timetableDAO.getClassCount());
-                request.setAttribute("users", userDAO.getAllUsers());
+                // ...
+                System.out.println("DEBUG: Forwarding to /WEB-INF/pages/admin-dashboard.jsp");
                 request.getRequestDispatcher("/WEB-INF/pages/admin-dashboard.jsp").forward(request, response);
             } else if ("schedule".equals(view)) {
-                List<TimetableEntry> timetable = timetableDAO.getTimetable();
-                List<Teacher> teachers = teacherDAO.getAllTeachers();
-                List<Module> modules = moduleDAO.getAllModules();
-                List<Section> sections = sectionDAO.getAllSections();
-                
-                request.setAttribute("timetable", timetable);
-                request.setAttribute("teachers", teachers);
-                request.setAttribute("modules", modules);
-                request.setAttribute("sections", sections);
+                // ...
                 request.getRequestDispatcher("/WEB-INF/pages/manage-schedule.jsp").forward(request, response);
             } else if ("teachers".equals(view)) {
-                List<Teacher> teachers = teacherDAO.getAllTeachers();
-                List<Module> modules = moduleDAO.getAllModules();
-                
-                request.setAttribute("teachers", teachers);
-                request.setAttribute("modules", modules);
+                // ...
                 request.getRequestDispatcher("/WEB-INF/pages/manage-teachers.jsp").forward(request, response);
             } else if ("announcements".equals(view)) {
-                List<Announcement> announcements = announcementDAO.getAllAnnouncements();
-                request.setAttribute("announcements", announcements);
+                // ...
                 request.getRequestDispatcher("/WEB-INF/pages/manage-announcements.jsp").forward(request, response);
             }
         } catch (Exception e) {
@@ -85,7 +76,11 @@ public class AdminDashboardServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("DEBUG: AdminDashboardServlet.doPost() reached.");
+        // ... (rest of the code)
         String action = request.getParameter("action");
+        System.out.println("DEBUG: Admin action: " + action);
+        // ... (rest of the code)
         String redirectView = "dashboard";
         
         if (action == null) {

@@ -79,6 +79,46 @@ public class StudentDashboardServlet extends HttpServlet {
 
             } else if ("announcements".equals(view)) {
                 request.setAttribute("announcements", announcementDAO.getAllAnnouncements());
+            } else if ("compare".equals(view)) {
+                System.out.println("DEBUG: Entering Compare View - Fetching all sections");
+                List<Section> sections = sectionDAO.getAllSections();
+                request.setAttribute("sections", sections);
+
+                String rawSectionIds = request.getParameter("sectionIds");
+                List<Integer> selectedIds = new ArrayList<>();
+                List<Section> selectedSectionObjects = new ArrayList<>();
+
+                System.out.println("DEBUG: Received raw sectionIds parameter: \"" + (rawSectionIds != null ? rawSectionIds : "") + "\"");
+
+                if (rawSectionIds != null && !rawSectionIds.trim().isEmpty()) {
+                    String[] parts = rawSectionIds.split(",");
+                    for (String idStr : parts) {
+                        if (idStr != null && !idStr.trim().isEmpty()) {
+                            try {
+                                int id = Integer.parseInt(idStr.trim());
+                                selectedIds.add(id);
+                                if (sections != null) {
+                                    for (Section s : sections) {
+                                        if (s.getSectionId() == id) {
+                                            selectedSectionObjects.add(s);
+                                            break;
+                                        }
+                                    }
+                                }
+                            } catch (NumberFormatException e) {
+                                System.err.println("DEBUG: Skipping invalid sectionId token: " + idStr);
+                            }
+                        }
+                    }
+                }
+
+                System.out.println("DEBUG: Parsed Selected IDs: " + selectedIds);
+                List<TimetableEntry> combinedTimetable = !selectedIds.isEmpty() ? timetableDAO.fetchTimetableBySections(selectedIds) : new ArrayList<>();
+                System.out.println("DEBUG: Fetched " + combinedTimetable.size() + " entries for comparison");
+
+                request.setAttribute("selectedSections", selectedSectionObjects);
+                request.setAttribute("combinedTimetable", combinedTimetable);
+                request.setAttribute("rawSelectedIds", rawSectionIds != null ? rawSectionIds : "");
             }
             
             request.getRequestDispatcher("/WEB-INF/pages/student-dashboard.jsp").forward(request, response);
