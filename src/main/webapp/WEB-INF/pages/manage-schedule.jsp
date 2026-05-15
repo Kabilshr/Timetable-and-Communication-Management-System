@@ -128,38 +128,40 @@
                 <div class="section-header">
                     <h2>Current Timetable</h2>
                 </div>
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Day</th>
-                            <th>Time Range</th>
-                            <th>Module</th>
-                            <th>Section</th>
-                            <th>Instructor</th>
-                            <th>Room</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:forEach items="${timetable}" var="e">
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
                             <tr>
-                                <td>${e.day}</td>
-                                <td>${e.startTime} - ${e.endTime}</td>
-                                <td>${e.moduleTitle}</td>
-                                <td>${e.year} - ${e.sectionName}</td>
-                                <td>${e.lecturerName}</td>
-                                <td>${e.room}</td>
-                                <td>
-                                    <form action="admin-dashboard" method="POST" style="display:inline">
-                                        <input type="hidden" name="action" value="deleteTimetable">
-                                        <input type="hidden" name="id" value="${e.entryId}">
-                                        <button type="submit" class="btn-delete">Delete</button>
-                                    </form>
-                                </td>
+                                <th>Day</th>
+                                <th>Time Range</th>
+                                <th>Module</th>
+                                <th>Section</th>
+                                <th>Instructor</th>
+                                <th>Room</th>
+                                <th>Action</th>
                             </tr>
-                        </c:forEach>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <c:forEach items="${timetable}" var="e">
+                                <tr>
+                                    <td>${e.day}</td>
+                                    <td>${e.startTime} - ${e.endTime}</td>
+                                    <td>${e.moduleTitle}</td>
+                                    <td>${e.year} - ${e.sectionName}</td>
+                                    <td>${e.lecturerName}</td>
+                                    <td>${e.room}</td>
+                                    <td>
+                                        <form action="admin-dashboard" method="POST" style="display:inline">
+                                            <input type="hidden" name="action" value="deleteTimetable">
+                                            <input type="hidden" name="id" value="${e.entryId}">
+                                            <button type="submit" class="btn-delete">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

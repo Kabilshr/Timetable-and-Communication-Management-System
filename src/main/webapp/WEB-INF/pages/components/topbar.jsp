@@ -4,6 +4,9 @@
 <header class="admin-topbar">
     <div class="topbar-container">
         <div class="topbar-left">
+            <button id="sidebarToggle" class="hamburger-menu" aria-label="Toggle Sidebar">
+                <span class="material-symbols-outlined" id="menuIcon">menu</span>
+            </button>
             <span class="brand-name">Class Sync</span>
         </div>
 

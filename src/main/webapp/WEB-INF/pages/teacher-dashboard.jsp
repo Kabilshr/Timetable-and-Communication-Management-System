@@ -25,7 +25,7 @@
             <c:choose>
                 <%-- MAIN DASHBOARD VIEW --%>
                 <c:when test="${view == 'dashboard'}">
-                    <div style="display: grid; grid-template-columns: 1fr 320px; gap: 2rem;">
+                    <div class="dashboard-grid">
                         <div>
                             <div class="admin-section" style="background: linear-gradient(135deg, #2e7d32, #4caf50); color: white; padding: 2.5rem; border-radius: 1.5rem;">
                                 <h1 style="font-size: 2rem; margin-bottom: 0.5rem; color: white;">Welcome, Prof. ${sessionScope.user.name}</h1>

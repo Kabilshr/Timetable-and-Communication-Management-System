@@ -49,7 +49,7 @@
         <div class="admin-content">
             <c:choose>
                 <c:when test="${view == 'dashboard'}">
-                    <div style="display: grid; grid-template-columns: 1fr 320px; gap: 2rem;">
+                    <div class="dashboard-grid">
                         <div>
                             <div class="welcome-card">
                                 <h1>${greeting}, ${sessionScope.user.name}!</h1>

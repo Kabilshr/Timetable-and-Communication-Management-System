@@ -24,12 +24,23 @@
             </div>
             <span class="logo-text">Class Sync</span>
         </a>
-        <div class="nav-actions">
+        <button class="hamburger" id="menuToggle">
+            <span class="material-symbols-outlined">menu</span>
+        </button>
+        <div class="nav-actions" id="navMenu">
             <button class="btn-text" onclick="location.href='<%= path %>/login'">Login</button>
             <button class="btn-primary" onclick="location.href='<%= path %>/register'">Register</button>
         </div>
     </div>
 </header>
+
+<script>
+    document.getElementById('menuToggle').addEventListener('click', function() {
+        document.getElementById('navMenu').classList.toggle('active');
+        const icon = this.querySelector('.material-symbols-outlined');
+        icon.textContent = icon.textContent === 'menu' ? 'close' : 'menu';
+    });
+</script>
 
 <main class="main">
 

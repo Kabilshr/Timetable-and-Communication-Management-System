@@ -40,30 +40,32 @@
                     </div>
                 </form>
 
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Teacher Name</th>
-                            <th>Email</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:forEach items="${teachers}" var="t">
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
                             <tr>
-                                <td><strong>${t.teacherName}</strong></td>
-                                <td>${t.teacherEmail}</td>
-                                <td>
-                                    <form action="admin-dashboard" method="POST" style="display:inline">
-                                        <input type="hidden" name="action" value="deleteTeacher">
-                                        <input type="hidden" name="id" value="${t.teacherId}">
-                                        <button type="submit" class="btn-delete">Remove</button>
-                                    </form>
-                                </td>
+                                <th>Teacher Name</th>
+                                <th>Email</th>
+                                <th>Action</th>
                             </tr>
-                        </c:forEach>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <c:forEach items="${teachers}" var="t">
+                                <tr>
+                                    <td><strong>${t.teacherName}</strong></td>
+                                    <td>${t.teacherEmail}</td>
+                                    <td>
+                                        <form action="admin-dashboard" method="POST" style="display:inline">
+                                            <input type="hidden" name="action" value="deleteTeacher">
+                                            <input type="hidden" name="id" value="${t.teacherId}">
+                                            <button type="submit" class="btn-delete">Remove</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

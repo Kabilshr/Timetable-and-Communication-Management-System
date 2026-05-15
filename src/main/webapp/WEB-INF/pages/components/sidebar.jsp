@@ -78,3 +78,65 @@
         </c:if>
     </nav>
 </aside>
+
+<div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
+<script>
+    (function() {
+        let retryCount = 0;
+        const maxRetries = 10;
+
+        function initSidebar() {
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const sidebar = document.querySelector('.admin-sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            const menuIcon = document.getElementById('menuIcon');
+            const body = document.body;
+
+            if (!toggleBtn || !sidebar || !backdrop || !menuIcon) {
+                if (retryCount < maxRetries) {
+                    retryCount++;
+                    setTimeout(initSidebar, 100);
+                }
+                return;
+            }
+
+            function toggleSidebar() {
+                const isOpen = sidebar.classList.toggle('open');
+                backdrop.classList.toggle('active');
+                body.classList.toggle('sidebar-open');
+                
+                // Change icon
+                menuIcon.textContent = isOpen ? 'close' : 'menu';
+                
+                console.log('DEBUG: Sidebar state - ' + (isOpen ? 'OPEN' : 'CLOSED'));
+            }
+
+            toggleBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleSidebar();
+            });
+
+            backdrop.addEventListener('click', function() {
+                toggleSidebar();
+            });
+
+            // Close sidebar when a link is clicked (on mobile)
+            const navLinks = sidebar.querySelectorAll('.sidebar-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth < 768 && sidebar.classList.contains('open')) {
+                        toggleSidebar();
+                    }
+                });
+            });
+        }
+
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initSidebar);
+        } else {
+            initSidebar();
+        }
+    })();
+</script>

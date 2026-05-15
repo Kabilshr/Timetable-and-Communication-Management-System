@@ -41,33 +41,36 @@
 
             <div class="admin-section">
                 <div class="section-header">
-                    <h2>Past Announcements</h2>
+                    <h2>Announcement History</h2>
                 </div>
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Title</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:forEach items="${announcements}" var="a">
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
                             <tr>
-                                <td>${a.createdAt}</td>
-                                <td><strong>${a.title}</strong></td>
-                                <td>
-                                    <form action="admin-dashboard" method="POST" style="display:inline">
-                                        <input type="hidden" name="action" value="deleteAnnouncement">
-                                        <input type="hidden" name="id" value="${a.id}">
-                                        <button type="submit" class="btn-delete">Delete</button>
-                                    </form>
-                                </td>
+                                <th>Date</th>
+                                <th>Title</th>
+                                <th>Action</th>
                             </tr>
-                        </c:forEach>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <c:forEach items="${announcements}" var="a">
+                                <tr>
+                                    <td>${a.createdAt}</td>
+                                    <td><strong>${a.title}</strong></td>
+                                    <td>
+                                        <form action="admin-dashboard" method="POST" style="display:inline">
+                                            <input type="hidden" name="action" value="deleteAnnouncement">
+                                            <input type="hidden" name="id" value="${a['id']}">
+                                            <button type="submit" class="btn-delete">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
         </div>
     </div>
 </div>

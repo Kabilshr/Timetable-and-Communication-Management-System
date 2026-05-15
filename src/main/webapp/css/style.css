@@ -70,6 +70,15 @@ h1, h2, h3, .logo {
     gap: 1rem;
 }
 
+.hamburger {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-color);
+    padding: 5px;
+}
+
 .main {
     padding-top: 100px;
 }
@@ -81,13 +90,15 @@ h1, h2, h3, .logo {
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    padding: 60px;
+    padding: 60px 20px;
     max-width: 1200px;
     margin: 0 auto;
 }
 
 .hero-text {
-    max-width: 500px;
+    flex: 1;
+    min-width: 300px;
+    max-width: 600px;
 }
 
 .badge {
@@ -103,8 +114,8 @@ h1, h2, h3, .logo {
 }
 
 .hero-text h1 {
-    font-size: 3rem;
-    line-height: 1.2;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.1;
     margin-bottom: 20px;
 }
 
@@ -119,6 +130,9 @@ h1, h2, h3, .logo {
 }
 
 .hero-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
     margin-top: 20px;
 }
 
@@ -156,7 +170,7 @@ h1, h2, h3, .logo {
 }
 
 .large {
-    margin-right: 10px;
+    /* Kept for compatibility but gap handled by .hero-buttons */
 }
 
 .btn-primary:hover {
@@ -167,11 +181,13 @@ h1, h2, h3, .logo {
     flex: 1;
     min-width: 300px;
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
+    margin-top: 40px;
 }
 
 .hero-image img {
     max-width: 100%;
+    height: auto;
     border-radius: 15px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.1);
 }
@@ -179,7 +195,7 @@ h1, h2, h3, .logo {
 /* --- FEATURES --- */
 
 .features {
-    padding: 80px 60px;
+    padding: 80px 20px;
     text-align: center;
     background-color: var(--background);
 }
@@ -190,18 +206,17 @@ h1, h2, h3, .logo {
 }
 
 .feature-grid {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
-    justify-content: center;
-    margin-top: 30px;
+    max-width: 1100px;
+    margin: 30px auto 0;
 }
 
 .card {
     background: white;
     padding: 40px 20px;
     border-radius: 15px;
-    width: 300px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     transition: transform 0.3s;
 }
@@ -227,6 +242,77 @@ h1, h2, h3, .logo {
 
 .highlight h3, .highlight p {
     color: white;
+}
+
+/* --- RESPONSIVE MEDIA QUERIES --- */
+
+@media (max-width: 1024px) {
+    .feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        background: #fff;
+    }
+
+    .hamburger {
+        display: block;
+    }
+
+    .nav-actions {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: white;
+        padding: 20px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        gap: 15px;
+        text-align: center;
+    }
+
+    .nav-actions.active {
+        display: flex;
+    }
+
+    .hero {
+        padding: 40px 20px;
+        text-align: center;
+    }
+
+    .hero-text {
+        max-width: 100%;
+    }
+
+    .hero-buttons {
+        justify-content: center;
+    }
+
+    .hero-image {
+        margin-top: 30px;
+    }
+
+    .features {
+        padding: 60px 20px;
+    }
+
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-text h1 {
+        font-size: 2rem;
+    }
+    
+    .btn-primary, .btn-secondary {
+        width: 100%;
+    }
 }
 
 /* --- FOOTER --- */
@@ -762,10 +848,32 @@ main {
 
 
 /* --- Admin Table --- */
+.table-responsive {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 1rem;
+    border-radius: 0.5rem;
+}
+
 .admin-table {
     width: 100%;
+    min-width: 700px;
     border-collapse: collapse;
-    margin-top: 1rem;
+    display: block; /* Allows overflow-x to work on the table itself if wrapper is missing */
+    overflow-x: auto;
+}
+
+/* Ensure table elements behave correctly within display: block table */
+.admin-table thead, 
+.admin-table tbody {
+    display: table;
+    width: 100%;
+}
+
+.admin-table tr {
+    display: table-row;
 }
 
 .admin-table th {
@@ -783,6 +891,38 @@ main {
     font-size: 0.9rem;
     border-bottom: 1px solid #e2e8f0;
     color: var(--text-color);
+}
+
+/* Alternating Row Backgrounds */
+.admin-table tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+
+.admin-table tr:hover {
+    background-color: #f1f5f9;
+    transition: background-color 0.2s;
+}
+
+/* --- Subtle Scrollbar Styling --- */
+.table-responsive::-webkit-scrollbar,
+.admin-table::-webkit-scrollbar {
+    height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track,
+.admin-table::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.table-responsive::-webkit-scrollbar-thumb,
+.admin-table::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover,
+.admin-table::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }
 
 /* --- Admin Dashboard Layout --- */
@@ -853,6 +993,7 @@ main {
     display: flex;
     flex-direction: column;
     min-width: 0;
+    min-height: 100vh;
 }
 
 /* TOPBAR / NAVBAR */
@@ -861,9 +1002,12 @@ main {
     background: white;
     border-bottom: 1px solid var(--outline-variant);
     padding: 0 24px;
-    height: 70px;
+    min-height: 70px;
     display: flex;
     align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .topbar-container {
@@ -871,6 +1015,8 @@ main {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
 .topbar-left {
@@ -879,6 +1025,42 @@ main {
 }
 
 /* CONTENT */
+
+.admin-content {
+    padding: 24px;
+    flex: 1;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .admin-content {
+        padding: 16px;
+    }
+    
+    .admin-topbar {
+        padding: 12px 16px;
+    }
+    
+    .topbar-container {
+        gap: 8px;
+    }
+    
+    .brand-name {
+        font-size: 1.25rem;
+    }
+}
 
 /* --- Shared Calendar Design System --- */
 .timetable-container {
@@ -973,6 +1155,74 @@ main {
 @media (max-width: 768px) {
     .class-block { padding: 6px; }
     .block-module { font-size: 0.75rem; }
+}
+
+/* --- Responsive Sidebar --- */
+.hamburger-menu {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--primary);
+    padding: 8px;
+    margin-right: 8px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    align-items: center;
+    justify-content: center;
+}
+
+.hamburger-menu:hover {
+    background-color: rgba(0, 89, 187, 0.05);
+}
+
+.sidebar-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1050;
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+@media (max-width: 767px) {
+    .hamburger-menu {
+        display: flex;
+    }
+
+    .admin-sidebar {
+        position: fixed;
+        left: -260px;
+        top: 0;
+        bottom: 0;
+        z-index: 1100;
+        height: 100vh;
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+        background: white; /* Ensure white background on mobile */
+    }
+
+    .admin-sidebar.open {
+        left: 0;
+    }
+
+    .sidebar-backdrop.active {
+        display: block;
+        opacity: 1;
+    }
+
+    body.sidebar-open {
+        overflow: hidden;
+    }
+
+    .admin-topbar {
+        padding: 0 16px;
+    }
 }
 
 

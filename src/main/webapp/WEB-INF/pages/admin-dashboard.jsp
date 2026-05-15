@@ -72,30 +72,32 @@
                         <div class="section-header">
                             <h2>User Management</h2>
                         </div>
-                        <table class="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>User ID</th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Role</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <c:forEach items="${users}" var="u">
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
                                     <tr>
-                                        <td>#${u.userId}</td>
-                                        <td style="font-weight: 700;">${u.name}</td>
-                                        <td>${u.email}</td>
-                                        <td>
-                                            <span class="badge" style="background: ${u.role == 'Admin' ? '#fee2e2' : (u.role == 'Teacher' ? '#dcfce7' : '#e0f2fe')}; color: ${u.role == 'Admin' ? '#991b1b' : (u.role == 'Teacher' ? '#166534' : '#0369a1')}">
-                                                ${u.role}
-                                            </span>
-                                        </td>
+                                        <th>User ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
                                     </tr>
-                                </c:forEach>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <c:forEach items="${users}" var="u">
+                                        <tr>
+                                            <td>#${u.userId}</td>
+                                            <td style="font-weight: 700;">${u.name}</td>
+                                            <td>${u.email}</td>
+                                            <td>
+                                                <span class="badge" style="background: ${u.role == 'Admin' ? '#fee2e2' : (u.role == 'Teacher' ? '#dcfce7' : '#e0f2fe')}; color: ${u.role == 'Admin' ? '#991b1b' : (u.role == 'Teacher' ? '#166534' : '#0369a1')}">
+                                                    ${u.role}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </c:when>
                 <c:otherwise>
