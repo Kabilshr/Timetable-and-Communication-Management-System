@@ -115,15 +115,12 @@
                     <div class="admin-section">
                         <h1>Full Academic Timetable</h1>
                         <c:choose>
-                            <c:when test="${not empty timetable}">                                <%-- DEBUG: Data binding check --%>
-                                <div style="background: #eef2f7; padding: 1rem; margin-bottom: 1rem; border-radius: 12px; font-size: 0.8rem;">
-                                    <strong>DEBUG:</strong> Entries = ${fn:length(timetable)}
-                                </div>
+                            <c:when test="${not empty timetable}">
                                 <div class="timetable-scroll">
                                     <div class="timetable-wrapper">
                                         <div class="timetable-grid">
-                                            <div class="grid-time"></div>
-                                            <div class="grid-day">Sun</div><div class="grid-day">Mon</div><div class="grid-day">Tue</div><div class="grid-day">Wed</div><div class="grid-day">Thu</div><div class="grid-day">Fri</div>
+                                            <div class="grid-time" style="height: 56px;"></div>
+                                            <div class="day-header">SUN</div><div class="day-header">MON</div><div class="day-header">TUE</div><div class="day-header">WED</div><div class="day-header">THU</div><div class="day-header">FRI</div>
                                             
                                             <c:forEach begin="6" end="17" var="hour">
                                                 <div class="grid-time">${hour}:00</div>
@@ -140,11 +137,11 @@
                                                             <c:set var="endMinutes" value="${(e.endTime.hours * 60) + e.endTime.minutes}" />
                                                             
                                                             <c:set var="minutesFromStart" value="${startMinutes - 360}" />
-                                                            <c:set var="top" value="${(minutesFromStart * 2) + 48}" />
+                                                            <c:set var="top" value="${(minutesFromStart * 2) + 56}" />
                                                             <c:set var="height" value="${(endMinutes - startMinutes) * 2}" />
                                                             
                                                             <div class="class-block" style="top: ${top}px; height: ${height}px;">
-                                                                <div class="block-module">${e.moduleCode}</div>
+                                                                <div class="block-module">${e.moduleTitle}</div>
                                                                 <div class="block-lecturer">${e.lecturerName}</div>
                                                                 <div class="block-time">
                                                                     <fmt:formatDate value="${e.startTime}" pattern="hh:mm a" /> - 
@@ -222,20 +219,17 @@
 						    if (rawIds && rawIds.trim().length > 0) {
 						        selectedIds = rawIds.split(',').filter(id => id.trim().length > 0).map(id => id.trim());
 						    }
-						    console.log("DEBUG: Initial selectedIds:", selectedIds);
 						
 						    function updateHiddenInput() {
 						        const hiddenInput = document.getElementById('selectedSectionIds');
 						        if (hiddenInput) {
 						            hiddenInput.value = selectedIds.join(',');
-						            console.log("DEBUG: Updated hidden input value:", hiddenInput.value);
 						        }
 						    }
 						
 						    function addSectionChip() {
 						        const select = document.getElementById('sectionSelect');
 						        if (!select || select.selectedIndex < 0) {
-						            console.log("DEBUG: No section selected or select element missing");
 						            return;
 						        }
 						
@@ -244,7 +238,6 @@
 						        const text = option.text;
 						
 						        if (!id || id === "" || selectedIds.includes(id.toString())) {
-						            console.log("DEBUG: Section already added or invalid ID. Current IDs:", selectedIds);
 						            return;
 						        }
 						
@@ -270,18 +263,14 @@
 						        chip.appendChild(textSpan);
 						        chip.appendChild(removeBtn);
 						        container.appendChild(chip);
-						
-						        console.log("DEBUG: Chip successfully added to UI for Section:", text, "(ID: " + id + ")");
 						    }
 						
 						    function removeSectionChip(id, chipElement) {
-						        console.log("DEBUG: Request to remove section ID:", id);
 						        selectedIds = selectedIds.filter(sid => sid !== id.toString());
 						        updateHiddenInput();
 						
 						        if (chipElement) {
 						            chipElement.remove();
-						            console.log("DEBUG: Chip successfully removed from UI for ID:", id);
 						        }
 						    }
 						
@@ -311,8 +300,6 @@
 						                container.appendChild(chip);
 						            }
 						        });
-						
-						        console.log("DEBUG: Page loaded, hidden input synced, chips prepopulated");
 						    });
 						    document.addEventListener('DOMContentLoaded', function() {
 						        const container = document.getElementById('chipsContainer');
@@ -324,15 +311,11 @@
 						            const textSpan = chip.querySelector('span');
 						            if (textSpan && textSpan.textContent.trim() === 'Choose a section...') {
 						                chip.remove();
-						                console.log('DEBUG: Removed placeholder chip:', textSpan.textContent);
 						            }
 						        });
-
-						        console.log('DEBUG: Post-load chip cleanup done');
 						    });
 						</script>
                         <!-- Calendar Rendering -->
-                        <!-- DEBUG: Combined Timetable Size: ${fn:length(combinedTimetable)} -->
                         <div class="timetable-container">
                             <div class="timetable-scroll">
                                 <div class="timetable-wrapper">

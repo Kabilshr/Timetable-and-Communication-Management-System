@@ -79,6 +79,40 @@ public class StudentDashboardServlet extends HttpServlet {
 
             } else if ("announcements".equals(view)) {
                 request.setAttribute("announcements", announcementDAO.getAllAnnouncements());
+            } else if ("teachers".equals(view)) {
+                List<Teacher> teachers = teacherDAO.getAllTeachers();
+                System.out.println("DEBUG: Fetched " + (teachers != null ? teachers.size() : 0) + " teachers for dropdown");
+                if (teachers != null) {
+                    for (Teacher t : teachers) {
+                        System.out.println("DEBUG: Teacher - ID: " + t.getTeacherId() + ", Name: " + t.getTeacherName());
+                    }
+                }
+                request.setAttribute("teachers", teachers);
+
+                String teacherIdStr = request.getParameter("teacherId");
+                if (teacherIdStr != null && !teacherIdStr.isEmpty()) {
+                    try {
+                        int teacherId = Integer.parseInt(teacherIdStr);
+                        Teacher selectedTeacher = teacherDAO.getTeacherById(teacherId);
+                        request.setAttribute("selectedTeacher", selectedTeacher);
+
+                        if (selectedTeacher != null) {
+                            List<String> weekDays = Arrays.asList("MON", "TUE", "WED", "THU", "FRI");
+                            request.setAttribute("days", weekDays);
+
+                            Map<String, List<String>> freeSlotsByDay = new LinkedHashMap<>();
+                            List<TimetableEntry> teacherTimetable = timetableDAO.getTimetable(teacherId, null, null);
+
+                            for (String day : weekDays) {
+                                List<String> freeSlots = calculateFreeSlots(teacherTimetable, day);
+                                freeSlotsByDay.put(day, freeSlots);
+                            }
+                            request.setAttribute("freeSlotsByDay", freeSlotsByDay);
+                        }
+                    } catch (NumberFormatException e) {
+                        System.err.println("DEBUG: Invalid teacherId received: " + teacherIdStr);
+                    }
+                }
             } else if ("compare".equals(view)) {
                 System.out.println("DEBUG: Entering Compare View - Fetching all sections");
                 List<Section> sections = sectionDAO.getAllSections();
@@ -183,5 +217,36 @@ public class StudentDashboardServlet extends HttpServlet {
                 response.sendRedirect("student-dashboard?view=profile&error=true");
             }
         }
+    }
+    private List<String> calculateFreeSlots(List<TimetableEntry> timetable, String day) {
+        List<String> freeSlots = new ArrayList<>();
+        // Standard hours: 09:00 to 17:00
+        for (int h = 9; h < 17; h++) {
+            String slotStart = String.format("%02d:00", h);
+            String slotEnd = String.format("%02d:00", h + 1);
+            String slotDisplay = slotStart + " - " + slotEnd;
+
+            java.sql.Time sTime = java.sql.Time.valueOf(slotStart + ":00");
+            java.sql.Time eTime = java.sql.Time.valueOf(slotEnd + ":00");
+
+            boolean isBusy = false;
+            for (TimetableEntry entry : timetable) {
+                if (entry.getDay().equalsIgnoreCase(day)) {
+                    if (isOverlap(sTime, eTime, entry.getStartTime(), entry.getEndTime())) {
+                        isBusy = true;
+                        break;
+                    }
+                }
+            }
+            if (!isBusy) {
+                freeSlots.add(slotDisplay);
+            }
+        }
+        return freeSlots;
+    }
+
+    private boolean isOverlap(java.sql.Time s1, java.sql.Time e1, java.sql.Time s2, java.sql.Time e2) {
+        // Returns true if slot [s1, e1] overlaps with [s2, e2]
+        return s1.before(e2) && s2.before(e1);
     }
 }
