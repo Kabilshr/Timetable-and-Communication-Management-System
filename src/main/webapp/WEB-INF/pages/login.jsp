@@ -70,7 +70,7 @@
             </div>
             <% } %>
 
-            <form action="login" method="POST" class="form-stack">
+            <form id="loginForm" action="login" method="POST" class="form-stack">
                 <div>
                     <label class="field-label" for="email">Username or Email</label>
                     <div class="input-rel">
@@ -98,7 +98,7 @@
                 </div>
 
                 <div class="submit-area">
-                    <button class="btn-gradient" type="submit">
+                    <button id="loginBtn" class="btn-gradient" type="submit">
                         Login
                     </button>
                 </div>
@@ -118,6 +118,66 @@
         <p class="copyright-small">© 2026 Class Sync. All rights reserved.</p>
     </div>
 </footer>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const remainingSeconds = ${remainingSeconds != null ? remainingSeconds : 0};
+        const countdownSpan = document.getElementById("countdown");
+        const loginBtn = document.getElementById("loginBtn");
+        const loginForm = document.getElementById("loginForm");
+
+        if (remainingSeconds > 0) {
+            let timeLeft = remainingSeconds;
+            
+            // Disable button
+            loginBtn.disabled = true;
+            loginBtn.style.opacity = "0.5";
+            loginBtn.style.cursor = "not-allowed";
+            loginBtn.innerText = "Locked";
+
+            // Prevent Enter key submission
+            const preventEnter = function(e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    return false;
+                }
+            };
+            loginForm.addEventListener("keydown", preventEnter);
+
+            // Block form submission attempt
+            loginForm.onsubmit = function(e) {
+                if (timeLeft > 0) {
+                    e.preventDefault();
+                    return false;
+                }
+            };
+
+            const timer = setInterval(function() {
+                timeLeft--;
+                if (countdownSpan) {
+                    countdownSpan.innerText = timeLeft;
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    // Re-enable UI
+                    loginBtn.disabled = false;
+                    loginBtn.style.opacity = "1";
+                    loginBtn.style.cursor = "pointer";
+                    loginBtn.innerText = "Login";
+                    loginForm.removeEventListener("keydown", preventEnter);
+                    loginForm.onsubmit = null;
+                    
+                    // Hide error box if it was just a lockout notice
+                    const errorBox = document.querySelector(".alert-error");
+                    if (errorBox && errorBox.innerText.includes("Account locked")) {
+                        errorBox.style.display = "none";
+                    }
+                }
+            }, 1000);
+        }
+    });
+</script>
 
 </body>
 </html>
