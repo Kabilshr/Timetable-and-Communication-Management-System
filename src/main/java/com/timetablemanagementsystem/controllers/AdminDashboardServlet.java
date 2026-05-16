@@ -36,15 +36,10 @@ public class AdminDashboardServlet extends HttpServlet {
             User user = (User) session.getAttribute("user");
             String role = user.getRole();
             System.out.println("DEBUG: User " + user.getName() + " with role " + role + " accessing admin dashboard.");
+            
             if (!"Admin".equalsIgnoreCase(role)) {
-                // ... (logic remains same)
-                if ("Student".equalsIgnoreCase(role)) {
-                    response.sendRedirect("student-dashboard");
-                } else if ("Teacher".equalsIgnoreCase(role)) {
-                    response.sendRedirect("teacher-dashboard");
-                } else {
-                    response.sendRedirect("portal");
-                }
+                System.out.println("DEBUG: Unauthorized access attempt by " + user.getEmail() + " (Role: " + role + ")");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
 

@@ -871,27 +871,46 @@ main {
     transition: background-color 0.2s;
 }
 
-/* --- Subtle Scrollbar Styling --- */
-.table-responsive::-webkit-scrollbar,
-.admin-table::-webkit-scrollbar {
-    height: 6px;
+/* --- Error Pages --- */
+.error-page-container {
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
-.table-responsive::-webkit-scrollbar-track,
-.admin-table::-webkit-scrollbar-track {
-    background: transparent;
+.error-code {
+    font-size: clamp(4rem, 15vw, 8rem);
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1;
+    margin-bottom: 1rem;
+    font-family: 'Manrope', sans-serif;
 }
 
-.table-responsive::-webkit-scrollbar-thumb,
-.admin-table::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 10px;
+.error-message {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 1rem;
 }
 
-.table-responsive::-webkit-scrollbar-thumb:hover,
-.admin-table::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+.error-description {
+    color: var(--light-text);
+    margin-bottom: 2rem;
+    font-size: 1rem;
 }
+
+.error-actions {
+    display: flex;
+    gap: 1rem;
+}
+
 
 /* --- Admin Dashboard Layout --- */
 
